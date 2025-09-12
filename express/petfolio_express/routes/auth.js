@@ -29,8 +29,13 @@ router.post('/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ error: 'Invalid password' });
 
         // generate JWT
-        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token });
+            const token = jwt.sign(
+                  { id: user._id, email: user.email }, 
+                  JWT_SECRET, 
+                  { expiresIn: '1d' }
+                );
+
+                res.json({ token }); // ส่งกลับไป frontend
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
