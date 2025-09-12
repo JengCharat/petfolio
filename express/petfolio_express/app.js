@@ -1,5 +1,4 @@
 const connectDB = require('./db');
-const Student = require('./models/Student');
 const port = process.env.PORT || 3002;
 
 const express = require('express');
@@ -42,15 +41,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
-app.get('/students', async (req, res) => {
-  try {
-    const students = await Student.find({});
-    res.json(students);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({ error: err.message });
-  }
-});
 
 
 
