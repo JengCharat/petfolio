@@ -11,16 +11,32 @@ const cors = require("cors");
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-
+const authRoutes = require('./routes/auth');
 const app = express();
 
 // Connect to MongoDB
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Next.js frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// สำหรับ preflight OPTIONS requests
+app.options('*', cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(logger('dev'));
 app.use(express.json());
+/////////////////////////////////////////////
+app.use('/api/auth', authRoutes);
+/////////////////////////////////////////////
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -35,6 +51,13 @@ app.get('/students', async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 });
+
+
+
+
+
+
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
