@@ -42,6 +42,29 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 
+const Pet = require("./models/pet");
+
+// API ดึงสัตว์ทั้งหมด
+app.get("/pets", async (req, res) => {
+  try {
+    const pets = await Pet.find({});
+    res.json(pets);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// API เพิ่มสัตว์ใหม่
+app.post("/pets", async (req, res) => {
+  try {
+    const pet = new Pet(req.body);
+    await pet.save();
+    res.status(201).json(pet);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 
 
 
@@ -70,3 +93,5 @@ app.listen(port, () => {
 });
 
 module.exports = app;
+
+

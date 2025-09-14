@@ -36,7 +36,7 @@ export default function Navbar() {
               หน้าหลัก
             </Link>
             <Link
-              href="/pets"
+              href="/pet"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
               สัตว์เลี้ยง
