@@ -1,6 +1,6 @@
 "use client"; // ถ้าใช้ Next.js ต้องใส่
 import { useEffect } from "react";
-
+import Navbar from "../components/Navbar"
 import React, { useState } from "react";
 
 type PetType = "dog" | "cat" | "bird" | "fish" | "rabbit" | "hamster";
@@ -137,6 +137,7 @@ useEffect(() => {
 
 
     return (
+        <><Navbar/>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
@@ -332,6 +333,7 @@ useEffect(() => {
                 </div>
             )}
         </div>
+        </>
     );
 }
 
