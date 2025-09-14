@@ -13,6 +13,7 @@ const usersRouter = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const app = express();
 
+
 // Connect to MongoDB
 connectDB();
 
@@ -65,14 +66,30 @@ app.post("/pets", async (req, res) => {
   }
 });
 
+// แก้ไขสัตว์เลี้ยง
+app.put("/pets/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const updatedPet = await Pet.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true, runValidators: true } // new: คืนค่าอัปเดตแล้ว
+    );
+
+    if (!updatedPet) return res.status(404).json({ error: "Pet not found" });
+
+    res.json(updatedPet); // ส่ง JSON กลับไป frontend
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+}); 
 
 
 
-
-
-
-
-app.use('/', indexRouter);
+ 
+app.use('/', indexRouter); 
 app.use('/users', usersRouter);
 
 // Catch 404
