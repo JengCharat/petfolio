@@ -223,6 +223,26 @@ export default function PetApp() {
         }
     };
 
+    // เพิ่มฟังก์ชันลบสัตว์เลี้ยง
+const deletePet = async (petId: string) => {
+    if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสัตว์เลี้ยงตัวนี้?")) return;
+
+    try {
+        const res = await fetch(`http://localhost:3002/pets/${petId}`, {
+            method: "DELETE",
+        });
+
+        if (!res.ok) throw new Error("Failed to delete pet");
+
+        // อัปเดต frontend state
+        setPets(pets.filter((p) => p._id !== petId));
+    } catch (err) {
+        console.error("Error deleting pet:", err);
+        alert("ไม่สามารถลบสัตว์เลี้ยงได้ โปรดลองอีกครั้ง");
+    }
+};
+
+
 
 
 
@@ -282,6 +302,13 @@ export default function PetApp() {
                                 >
                                     แก้ไขข้อมูล
                                 </button>
+
+                                <button
+        onClick={() => deletePet(pet._id)}
+        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm"
+    >
+        ลบ
+    </button>
 
                             </div>
                         </div>
@@ -662,4 +689,3 @@ export default function PetApp() {
         </>
     );
 }
-
