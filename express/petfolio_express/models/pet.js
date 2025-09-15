@@ -11,6 +11,7 @@ const petSchema = new mongoose.Schema({
   personality: { type: String },
   medicalConditions: { type: String },
   privacy: { type: String, enum: ["private", "public"], default: "private" },
+  
 });
 
 

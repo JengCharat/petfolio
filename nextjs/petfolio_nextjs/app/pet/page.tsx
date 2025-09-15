@@ -18,6 +18,7 @@ type Pet = {
     medicalConditions: string;
     privacy: string;
     emoji: string;
+    
 };
 
 const typeEmojis: Record<PetType, string> = {
@@ -79,7 +80,7 @@ export default function PetApp() {
                 weight: newPet.weight !== null ? String(newPet.weight) : "",
             };
 
-            const res = await fetch("http://localhost:3002/pets", {
+            const res = await fetch("http://localhost:3002/api/pets", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -120,7 +121,7 @@ export default function PetApp() {
 
 
     useEffect(() => {
-        fetch("http://localhost:3002/pets")
+        fetch("http://localhost:3002/api/pets")
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
@@ -181,7 +182,7 @@ export default function PetApp() {
 
         try {
             console.log("Updating pet:", editingPet.id, updatedPet);
-            const res = await fetch(`http://localhost:3002/pets/${editingPet._id}`, {
+            const res = await fetch(`http://localhost:3002/api/pets/${editingPet._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedPet),
@@ -228,7 +229,7 @@ const deletePet = async (petId: string) => {
     if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสัตว์เลี้ยงตัวนี้?")) return;
 
     try {
-        const res = await fetch(`http://localhost:3002/pets/${petId}`, {
+        const res = await fetch(`http://localhost:3002/api/pets/${petId}`, {
             method: "DELETE",
         });
 
