@@ -11,9 +11,8 @@ const petSchema = new mongoose.Schema({
   personality: { type: String },
   medicalConditions: { type: String },
   privacy: { type: String, enum: ["private", "public"], default: "private" },
-  
+
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true } // เชื่อม User
 });
 
-
 module.exports = mongoose.model("Pet", petSchema);
-
