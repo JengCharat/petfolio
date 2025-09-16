@@ -36,6 +36,17 @@ const treatmentLabels: Record<Treatment, string> = {
     other: "อื่นๆ 📝",
 };
 
+// รายชื่อสัตว์เลี้ยง (id และ label)
+const petList = [
+    { id: "buddy", label: "บัดดี้ 🐕" },
+    { id: "mewmew", label: "มิวมิว 🐱" },
+    { id: "max", label: "แม็กซ์ 🐕" },
+    { id: "tono", label: "โตโน่ 🐱" },
+];
+const petLabels: Record<string, string> = Object.fromEntries(
+    petList.map((p) => [p.id, p.label])
+);
+
 export default function HealthApp() {
     const [records, setRecords] = useState<HealthRecord[]>([]);
     const [form, setForm] = useState({
@@ -72,7 +83,12 @@ export default function HealthApp() {
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
+        if (name === "cost") {
+            const num = value === "" ? 0 : Number(value);
+            setForm((prev) => ({ ...prev, [name]: num }));
+        } else {
+            setForm((prev) => ({ ...prev, [name]: value }));
+        }
     };
 
     // เพิ่มบันทึกสุขภาพ
@@ -87,7 +103,7 @@ export default function HealthApp() {
             if (!res.ok) throw new Error("Failed to add record");
 
             const saved = await res.json();
-            setRecords([...records, { ...saved, id: records.length + 1 }]);
+            setRecords((prev) => [...prev, { ...saved, id: prev.length + 1 }]);
             setShowModal(false);
             setForm({ pet: "", type: "", date: "", clinic: "", detail: "", cost: 0 });
         } catch (err) {
@@ -124,9 +140,13 @@ export default function HealthApp() {
             if (!res.ok) throw new Error("Failed to update record");
 
             const updated = await res.json();
-            setRecords(records.map((r) => (r._id === editingRecord._id ? updated : r)));
+            // รวมข้อมูล updated เข้ากับ record เดิมเพื่อรักษา id ของ UI
+            setRecords((prev) =>
+                prev.map((r) => (r._id === editingRecord._id ? { ...r, ...updated } : r))
+            );
             setShowEditModal(false);
             setEditingRecord(null);
+            setForm({ pet: "", type: "", date: "", clinic: "", detail: "", cost: 0 });
         } catch (err) {
             console.error(err);
             alert("ไม่สามารถแก้ไขบันทึกได้");
@@ -142,7 +162,7 @@ export default function HealthApp() {
             });
             if (!res.ok) throw new Error("Failed to delete");
 
-            setRecords(records.filter((r) => r._id !== id));
+            setRecords((prev) => prev.filter((r) => r._id !== id));
         } catch (err) {
             console.error(err);
             alert("ไม่สามารถลบได้");
@@ -167,7 +187,9 @@ export default function HealthApp() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {records.map((rec) => (
                         <div key={rec._id} className="p-4 bg-white rounded-lg shadow">
-                            <h3 className="text-lg font-semibold">{rec.pet}</h3>
+                            <h3 className="text-lg font-semibold">
+                                {petLabels[rec.pet] || rec.pet}
+                            </h3>
                             <p>{treatmentLabels[rec.type]}</p>
                             <p className="text-sm text-gray-500">{rec.date}</p>
                             <div className="flex gap-2 mt-3">
@@ -204,23 +226,20 @@ export default function HealthApp() {
                             <h2 className="text-2xl font-bold text-gray-800 mb-6">
                                 {showEditModal ? "แก้ไขบันทึกสุขภาพ" : "เพิ่มบันทึกสุขภาพ"}
                             </h2>
-                            <form
-                                onSubmit={showEditModal ? editRecord : addRecord}
-                                className="space-y-6"
-                            >
-
+                            <form onSubmit={showEditModal ? editRecord : addRecord} className="space-y-6">
                                 <select
-                                    name="type"
-                                    value={form.type}
+                                    name="pet"
+                                    value={form.pet}
                                     onChange={handleChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     required
                                 >
                                     <option value="">เลือกสัตว์เลี้ยงของคุณ</option>
-                                    <option value="dog">บัดดี้ 🐕</option>
-                                    <option value="cat">มิวมิว 🐱</option>
-                                    <option value="dog">แม็กซ์ 🐕</option>
-                                    <option value="cat">โตโน่ 🐱</option>
+                                    {petList.map((p) => (
+                                        <option key={p.id} value={p.id}>
+                                            {p.label}
+                                        </option>
+                                    ))}
                                 </select>
 
                                 <select
@@ -266,6 +285,7 @@ export default function HealthApp() {
                                     onChange={handleChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     placeholder="ค่าใช้จ่าย"
+                                    min={0}
                                 />
                                 <div className="flex justify-end gap-2">
                                     <button
@@ -273,6 +293,8 @@ export default function HealthApp() {
                                         onClick={() => {
                                             setShowModal(false);
                                             setShowEditModal(false);
+                                            setEditingRecord(null);
+                                            setForm({ pet: "", type: "", date: "", clinic: "", detail: "", cost: 0 });
                                         }}
                                         className="px-4 py-2 border rounded"
                                     >
@@ -295,7 +317,7 @@ export default function HealthApp() {
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                         <div className="bg-white p-6 rounded-xl max-w-md w-full">
                             <h3 className="text-xl font-bold mb-4">รายละเอียดบันทึก</h3>
-                            <p><strong>สัตว์เลี้ยง:</strong> {selectedRecord.pet}</p>
+                            <p><strong>สัตว์เลี้ยง:</strong> {petLabels[selectedRecord.pet] || selectedRecord.pet}</p>
                             <p><strong>ประเภท:</strong> {treatmentLabels[selectedRecord.type]}</p>
                             <p><strong>วันที่:</strong> {selectedRecord.date}</p>
                             <p><strong>สถานที่:</strong> {selectedRecord.clinic || "-"}</p>
@@ -310,8 +332,6 @@ export default function HealthApp() {
                                 </button>
                             </div>
                         </div>
-
-
                     </div>
                 )}
             </div>
