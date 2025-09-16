@@ -2,41 +2,52 @@
 import { useState } from "react";
 
 export default function Register() {
+  const [username, setUsername] = useState(""); // เพิ่ม username
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = async () => {
+const handleRegister = async () => {
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
+        alert("Passwords do not match");
+        return;
     }
 
     try {
-      const res = await fetch("http://localhost:3002/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+        const res = await fetch("http://localhost:3002/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+        });
 
-      const data = await res.json();
-      if (res.ok) {
-        alert("Register successful! You can now login.");
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-      } else {
-        alert(data.error || "Register failed");
-      }
+        const data = await res.json();
+        if (res.ok) {
+            alert("Register successful! Your userId: " + data.userId);
+            localStorage.setItem("userId", data.userId); // เก็บ userId ไว้ frontend
+            setUsername("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+        } else {
+            alert(data.error || "Register failed");
+        }
     } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+        console.error(err);
+        alert("Something went wrong");
     }
-  };
+};
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Register</h1>
+      <input
+        className="border p-2 mb-2 w-64"
+        placeholder="Username"
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
       <input
         className="border p-2 mb-2 w-64"
         placeholder="Email"
