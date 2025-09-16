@@ -1,11 +1,13 @@
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
+    userId: { type: String, unique: true }, // เพิ่ม field userId
+    username: { type: String, required: true, unique: true, maxlength: 20 },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true }
 });
+
 
 // hash password ก่อน save
 userSchema.pre('save', async function(next) {

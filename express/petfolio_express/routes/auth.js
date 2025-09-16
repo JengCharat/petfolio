@@ -1,20 +1,28 @@
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { nanoid } = require("nanoid");
 
 const JWT_SECRET = 'supersecretkey'; // ใส่ env variable จริง ๆ
 
 // Register
 router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
+
     try {
-        const user = new User({ email, password });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            if (existingUser.username === username) return res.status(400).json({ error: 'Username already taken' });
+            if (existingUser.email === email) return res.status(400).json({ error: 'Email already registered' });
+        }
+
+        const userId = nanoid(); // สร้าง userId อัตโนมัติ
+        const user = new User({ username, email, password, userId }); // ต้องเพิ่ม field userId ใน schema
         await user.save();
-        res.status(201).json({ message: 'User created' });
+        res.status(201).json({ message: 'User created', userId }); // ส่ง userId กลับ frontend
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -29,13 +37,13 @@ router.post('/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ error: 'Invalid password' });
 
         // generate JWT
-            const token = jwt.sign(
-                  { id: user._id, email: user.email }, 
-                  JWT_SECRET, 
-                  { expiresIn: '1d' }
-                );
+        const token = jwt.sign(
+            { id: user._id, username: user.username, email: user.email }, // ส่ง username ด้วย
+            JWT_SECRET,
+            { expiresIn: '1d' }
+        );
 
-                res.json({ token }); // ส่งกลับไป frontend
+        res.json({ token, username: user.username }); // ส่ง username กลับ frontend
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
