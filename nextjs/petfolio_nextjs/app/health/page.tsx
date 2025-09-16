@@ -220,6 +220,7 @@ export default function HealthApp() {
                                     <option value="dog">บัดดี้ 🐕</option>
                                     <option value="cat">มิวมิว 🐱</option>
                                     <option value="dog">แม็กซ์ 🐕</option>
+                                    <option value="cat">โตโน่ 🐱</option>
                                 </select>
 
                                 <select
