@@ -25,13 +25,13 @@ router.post("/", upload.array("images", 4), async (req, res) => {
     const user = await User.findOne({ userId: owner });
     if (!user) return res.status(400).json({ error: "User not found" });
 
+    // ตรวจสอบ pets ของ user
     let validPets = [];
     if (pets) {
       const petIds = Array.isArray(pets) ? pets : [pets];
-      // ตรวจสอบว่า Pet เป็นของ user จริง ๆ
       validPets = await Pet.find({
         _id: { $in: petIds },
-        owner: user.userId, // owner ของ Pet ต้องตรงกับ user.userId
+        owner: user._id, // owner เป็น ObjectId
       });
     }
 
@@ -42,11 +42,17 @@ router.post("/", upload.array("images", 4), async (req, res) => {
       PostDesc,
       images: imagePaths,
       pets: validPets.map((p) => p._id),
-      owner: user.userId, // เก็บ userId (string)
+      owner: user._id, // เก็บ ObjectId ของ user
     });
 
     await post.save();
-    res.status(201).json(post);
+
+    // populate pets และ owner
+    const populatedPost = await CommunityPost.findById(post._id)
+      .populate("pets")
+      .populate({ path: "owner", select: "username userId" });
+
+    res.status(201).json(populatedPost);
   } catch (err) {
     console.error("❌ Error creating post:", err);
     res.status(500).json({ error: err.message });
@@ -56,18 +62,14 @@ router.post("/", upload.array("images", 4), async (req, res) => {
 // 📌 ดึงโพสต์ทั้งหมด
 router.get("/", async (req, res) => {
   try {
-    const posts = await CommunityPost.find().populate("pets");
+    const posts = await CommunityPost.find()
+      .populate("pets")
+      .populate({ path: "owner", select: "username userId" });
 
-    // เติม username ให้แต่ละโพสต์
-    const postsWithUser = await Promise.all(
-      posts.map(async (post) => {
-        const user = await User.findOne({ userId: post.owner });
-        return {
-          ...post.toObject(),
-          ownerUsername: user ? user.username : "Unknown",
-        };
-      })
-    );
+    const postsWithUser = posts.map((post) => ({
+      ...post.toObject(),
+      ownerUsername: post.owner ? post.owner.username : "Unknown",
+    }));
 
     res.json(postsWithUser);
   } catch (err) {
