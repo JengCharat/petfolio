@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 
 type Treatment =
@@ -36,18 +36,46 @@ const treatmentLabels: Record<Treatment, string> = {
     other: "อื่นๆ 📝",
 };
 
-// รายชื่อสัตว์เลี้ยง (id และ label)
-const petList = [
-    { id: "buddy", label: "บัดดี้ 🐕" },
-    { id: "mewmew", label: "มิวมิว 🐱" },
-    { id: "max", label: "แม็กซ์ 🐕" },
-    { id: "tono", label: "โตโน่ 🐱" },
-];
-const petLabels: Record<string, string> = Object.fromEntries(
-    petList.map((p) => [p.id, p.label])
-);
+type Pet = {
+    _id: string;
+    name: string;
+    type?: string;
+    emoji?: string;
+};
 
 export default function HealthApp() {
+    // ✅ โหลด pets จาก backend
+    const [pets, setPets] = useState<Pet[]>([]);
+    useEffect(() => {
+        const ac = new AbortController();
+        fetch("http://localhost:3002/api/pets", { signal: ac.signal })
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch pets");
+                return res.json();
+            })
+            .then((data) => {
+                const arr = Array.isArray(data) ? data : data?.pets ?? [];
+                setPets(arr);
+            })
+            .catch((err) => {
+                if (err.name !== "AbortError") console.error("fetch pets error:", err);
+            });
+        return () => ac.abort();
+    }, []);
+
+    // ✅ petLabels สร้างจาก pets ที่โหลดมา
+    const petLabels: Record<string, string> = useMemo(
+        () =>
+            Object.fromEntries(
+                pets.map((p) => [
+                    p._id,
+                    `${p.name}${p.emoji ? " " + p.emoji : ""}${p.type ? ` (${p.type})` : ""}`,
+                ])
+            ),
+        [pets]
+    );
+
+    // ✅ state ของ health records
     const [records, setRecords] = useState<HealthRecord[]>([]);
     const [form, setForm] = useState({
         pet: "",
@@ -64,21 +92,7 @@ export default function HealthApp() {
     const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
 
-    // โหลดข้อมูลจาก backend
-    useEffect(() => {
-        fetch("http://localhost:3002/api/health")
-            .then((res) => res.json())
-            .then((data) => {
-                const formatted = data.map((r: any, i: number) => ({
-                    ...r,
-                    id: i + 1,
-                }));
-                setRecords(formatted);
-            })
-            .catch((err) => console.error(err));
-    }, []);
-
-    // ฟังก์ชันเปลี่ยนค่าในฟอร์ม
+    // ✅ handleChange ฟอร์ม
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
     ) => {
@@ -91,28 +105,33 @@ export default function HealthApp() {
         }
     };
 
-    // เพิ่มบันทึกสุขภาพ
+    // ✅ addRecord
     const addRecord = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        try {
-            const res = await fetch("http://localhost:3002/api/health", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
-            if (!res.ok) throw new Error("Failed to add record");
+    e.preventDefault();
+    try {
+        const res = await fetch("http://localhost:3002/api/health", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form),
+        });
 
-            const saved = await res.json();
-            setRecords((prev) => [...prev, { ...saved, id: prev.length + 1 }]);
-            setShowModal(false);
-            setForm({ pet: "", type: "", date: "", clinic: "", detail: "", cost: 0 });
-        } catch (err) {
-            console.error(err);
-            alert("ไม่สามารถเพิ่มบันทึกได้");
-        }
-    };
+        // 👀 debug response
+        const text = await res.text();
+        console.log("Server response:", res.status, text);
 
-    // เปิด modal แก้ไข
+        if (!res.ok) throw new Error("Failed to add record");
+
+        const saved = JSON.parse(text);
+        setRecords((prev) => [...prev, { ...saved, id: prev.length + 1 }]);
+        setShowModal(false);
+        setForm({ pet: "", type: "", date: "", clinic: "", detail: "", cost: 0 });
+    } catch (err) {
+        console.error("addRecord error:", err);
+        alert("ไม่สามารถเพิ่มบันทึกได้");
+    }
+};
+
+    // ✅ openEditModal
     const openEditModal = (record: HealthRecord) => {
         setEditingRecord(record);
         setForm({
@@ -126,7 +145,7 @@ export default function HealthApp() {
         setShowEditModal(true);
     };
 
-    // ฟังก์ชันแก้ไข
+    // ✅ editRecord
     const editRecord = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!editingRecord) return;
@@ -140,7 +159,6 @@ export default function HealthApp() {
             if (!res.ok) throw new Error("Failed to update record");
 
             const updated = await res.json();
-            // รวมข้อมูล updated เข้ากับ record เดิมเพื่อรักษา id ของ UI
             setRecords((prev) =>
                 prev.map((r) => (r._id === editingRecord._id ? { ...r, ...updated } : r))
             );
@@ -153,7 +171,7 @@ export default function HealthApp() {
         }
     };
 
-    // ลบ
+    // ✅ deleteRecord
     const deleteRecord = async (id: string) => {
         if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบ?")) return;
         try {
@@ -183,7 +201,7 @@ export default function HealthApp() {
                     </button>
                 </div>
 
-                {/* Grid */}
+                {/* Grid แสดง records */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {records.map((rec) => (
                         <div key={rec._id} className="p-4 bg-white rounded-lg shadow">
@@ -219,7 +237,7 @@ export default function HealthApp() {
                     ))}
                 </div>
 
-                {/* Modal: เพิ่ม / แก้ไข ใช้ฟอร์มเดียวกัน */}
+                {/* Modal: เพิ่ม / แก้ไข */}
                 {(showModal || showEditModal) && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
@@ -235,9 +253,9 @@ export default function HealthApp() {
                                     required
                                 >
                                     <option value="">เลือกสัตว์เลี้ยงของคุณ</option>
-                                    {petList.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.label}
+                                    {pets.map((p) => (
+                                        <option key={p._id} value={p._id}>
+                                            {p.name} {p.emoji ?? ""} {p.type ? `(${p.type})` : ""}
                                         </option>
                                     ))}
                                 </select>
