@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+#upload
+express\petfolio_express\uploads
+
 # testing
 /coverage
 
