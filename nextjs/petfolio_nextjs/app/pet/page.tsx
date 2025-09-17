@@ -252,7 +252,7 @@ const deletePet = async (petId: string) => {
 
     return (
         <><Navbar />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className=" min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#f5f5f5]">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-3xl font-bold text-gray-800">สัตว์เลี้ยงของฉัน</h2>

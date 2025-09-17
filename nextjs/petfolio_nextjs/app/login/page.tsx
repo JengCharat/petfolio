@@ -21,11 +21,12 @@ export default function Login() {
   };
 
   return (
-    <div>
-        <Navbar/>
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button onClick={handleLogin}>Login</button>
+
+    <div className="flex flex-col  min-h-screen  bg-[#f5f5f5]">
+      <Navbar/>
+      <input className="text-black border m-4" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+      <input className="text-black border m-4" placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <button className="text-black border m-4" onClick={handleLogin}>Login</button>
     </div>
   );
 }
