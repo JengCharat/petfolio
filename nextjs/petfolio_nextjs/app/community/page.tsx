@@ -1,4 +1,5 @@
-
+"use client"
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 
 
@@ -11,6 +12,7 @@ export default function Community(){
   <div className=" flex px-80 gap-4 items-start mt-8">
     {/* Left Sidebar */}
     <div className="border w-64  border-gray-300 px-4 pt-8 sticky top-32 self-start">
+      <p className="text-black">ตัวกรอง</p>
       <p className="text-black">Option1</p>
       <p className="text-black">Option2</p>
       <p className="text-black">Option3</p>
@@ -23,7 +25,13 @@ export default function Community(){
       <div className=" border-b border-gray-300 pt-12 w-full ">
         {/* ช่องสร้างโพส */}
         <div className="p-4 text-black">
-            สร้างโพส
+            สร้างโพสต์
+            <form action="/community" method="POST">
+              <label htmlFor="postdescription">Post Description: </label>
+              <input className="border" type="text" name="" id="postDesc" required/>
+              <button className="border" type="submit">Submit</button>
+
+            </form>
         </div>     
       </div>
 
@@ -39,6 +47,7 @@ export default function Community(){
 
     {/* Right Sidebar */}
     <div className="border w-64  border-gray-300 px-4 pt-8 sticky top-32 self-start">
+      <p className="text-black">โพสต์ยอดนิยม</p>
       <p className="text-black">Option1</p>
       <p className="text-black">Option2</p>
       <p className="text-black">Option3</p>
