@@ -28,25 +28,25 @@ router.post('/register', async (req, res) => {
 
 // Login
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'User not found' });
 
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) return res.status(400).json({ error: 'Invalid password' });
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return res.status(400).json({ error: 'Invalid password' });
 
-        // generate JWT
-        const token = jwt.sign(
-            { id: user._id, username: user.username, email: user.email }, // ส่ง username ด้วย
-            JWT_SECRET,
-            { expiresIn: '1d' }
-        );
+    const token = jwt.sign(
+      { userId: user.userId, username: user.username, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '1d' }
+    );
 
-        res.json({ token, username: user.username }); // ส่ง username กลับ frontend
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    res.json({ token, userId: user.userId, username: user.username }); // ✅ ส่ง userId
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 
 module.exports = router;

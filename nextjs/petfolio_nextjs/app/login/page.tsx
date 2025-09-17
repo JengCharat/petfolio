@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react";
 import Navbar from "../components/Navbar"
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,21 +13,22 @@ export default function Login() {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    if (data.token) {
+
+    if (data.token && data.userId) {
       localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId); // ✅ ใช้ userId
       alert("Login success");
     } else {
-      alert(data.error);
+      alert(data.error || "Login failed");
     }
   };
 
   return (
-
-    <div className="flex flex-col  min-h-screen  bg-[#f5f5f5]">
+    <div>
       <Navbar/>
-      <input className="text-black border m-4" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input className="text-black border m-4" placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button className="text-black border m-4" onClick={handleLogin}>Login</button>
+      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 }
