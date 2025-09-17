@@ -120,39 +120,38 @@ export default function PetApp() {
 
 
 
+const [userId, setUserId] = useState<string | null>(null);
+const [token, setToken] = useState<string | null>(null);
 
 useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
+  // โหลดค่าจาก localStorage หลัง mount
+  setUserId(localStorage.getItem("userId"));
+  setToken(localStorage.getItem("token"));
+}, []);
 
-    if (!userId) return;
+useEffect(() => {
+  if (!userId || !token) return;
 
-    fetch(`http://localhost:3002/api/pets/user/${userId}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    })
+  fetch(`http://localhost:3002/api/pets/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
     .then(res => res.json())
     .then(data => {
-         console.log("Pets from backend:", data);
-        if (!Array.isArray(data)) {
-            console.error("Backend returned non-array:", data);
-            setPets([]);
-            return;
-        }
-
-        const petsWithEmoji = data.map((pet: any, index: number) => ({
-    ...pet,
-    id: index + 1,
-    emoji: typeEmojis[pet.type as PetType] || "🐾",
-}));
-setPets(petsWithEmoji);
-
-
-        setPets(petsWithEmoji);
+      console.log("Pets from backend:", data);
+      if (!Array.isArray(data)) {
+        console.error("Backend returned non-array:", data);
+        setPets([]);
+        return;
+      }
+      const petsWithEmoji = data.map((pet: any, index: number) => ({
+        ...pet,
+        id: index + 1,
+        emoji: typeEmojis[pet.type as PetType] || "🐾",
+      }));
+      setPets(petsWithEmoji);
     })
     .catch(err => console.error(err));
-}, []);
+}, [userId, token]); // rerun เมื่อ userId/token เปลี่ยน
 
 
 
@@ -252,7 +251,7 @@ const deletePet = async (petId: string) => {
 
     return (
         <><Navbar />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-3xl font-bold text-gray-800">สัตว์เลี้ยงของฉัน</h2>
