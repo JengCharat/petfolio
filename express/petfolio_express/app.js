@@ -12,7 +12,7 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const petRoutes = require("./routes/pets");
-
+const remindersRouter = require('./routes/reminder');
 const app = express();
 
 // Connect to MongoDB
@@ -50,6 +50,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use('/api/reminders', remindersRouter);
+
+
 
 // Catch 404
 app.use(function (req, res, next) {
