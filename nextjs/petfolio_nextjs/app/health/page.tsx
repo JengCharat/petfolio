@@ -48,7 +48,7 @@ export default function HealthApp() {
     const [pets, setPets] = useState<Pet[]>([]);
     useEffect(() => {
         const ac = new AbortController();
-        fetch("http://localhost:3002/api/pets", { signal: ac.signal })
+        fetch("/api/pets", { signal: ac.signal })
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch pets");
                 return res.json();
@@ -86,6 +86,24 @@ export default function HealthApp() {
         cost: 0,
     });
 
+    // ✅ โหลด health records จาก backend
+useEffect(() => {
+    const ac = new AbortController();
+    fetch("/api/health", { signal: ac.signal })
+        .then((res) => {
+            if (!res.ok) throw new Error("Failed to fetch health records");
+            return res.json();
+        })
+        .then((data) => {
+            const arr = Array.isArray(data) ? data : data?.records ?? [];
+            setRecords(arr);
+        })
+        .catch((err) => {
+            if (err.name !== "AbortError") console.error("fetch health error:", err);
+        });
+    return () => ac.abort();
+}, []);
+
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingRecord, setEditingRecord] = useState<HealthRecord | null>(null);
@@ -109,11 +127,12 @@ export default function HealthApp() {
     const addRecord = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-        const res = await fetch("http://localhost:3002/api/health", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-        });
+        // page.tsx
+const res = await fetch("/api/health", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(form),
+});
 
         // 👀 debug response
         const text = await res.text();
@@ -151,7 +170,7 @@ export default function HealthApp() {
         if (!editingRecord) return;
 
         try {
-            const res = await fetch(`http://localhost:3002/api/health/${editingRecord._id}`, {
+            const res = await fetch(`/api/health/${editingRecord._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
@@ -175,7 +194,7 @@ export default function HealthApp() {
     const deleteRecord = async (id: string) => {
         if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบ?")) return;
         try {
-            const res = await fetch(`http://localhost:3002/api/health/${id}`, {
+            const res = await fetch(`/api/health/${id}`, {
                 method: "DELETE",
             });
             if (!res.ok) throw new Error("Failed to delete");
@@ -201,6 +220,7 @@ export default function HealthApp() {
                     </button>
                 </div>
 
+
                 {/* Grid แสดง records */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {records.map((rec) => (
@@ -217,8 +237,7 @@ export default function HealthApp() {
                                         setSelectedRecord(rec);
                                         setShowDetailModal(true);
                                     }}
-                                >
-                                    ดูรายละเอียด
+                                >ดูรายละเอียด
                                 </button>
                                 <button
                                     className="bg-yellow-500 text-white px-3 py-1 rounded"

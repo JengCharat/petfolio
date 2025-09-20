@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "mongoose": "^8.18.1",
     "nanoid": "^5.1.5"
   }
 }
