@@ -78,4 +78,30 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET posts ของ user ตาม userId
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // 1. หา user จาก userId
+    const user = await User.findOne({ userId: userId }); // สมมติ field ใน User คือ userId
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // 2. เอา _id ของ user เป็น ObjectId
+    const ownerId = user._id;
+
+    // 3. หาโพสต์โดย owner แล้วเรียงจากใหม่ → เก่า
+    const posts = await CommunityPost.find({ owner: ownerId }).sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Error fetching user posts:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
+
 module.exports = router;
