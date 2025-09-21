@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
-import { jwtDecode } from "jwt-decode";
 
 export default function Calendar() {
     const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
@@ -13,22 +12,24 @@ export default function Calendar() {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [pets, setPets] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
 
-    // useEffect ตัวเดียวที่จะดึงข้อมูลผู้ใช้ สัตว์เลี้ยง และกิจกรรม
     useEffect(() => {
         const fetchUserData = async () => {
             const token = localStorage.getItem('token');
-            if (!token) {
-                console.error("Token not found. User is not logged in.");
+            // แก้ไข: ดึง userId ที่เป็น String มาจาก localStorage
+            const currentUserId = localStorage.getItem('userId');
+
+            if (!token || !currentUserId) {
+                console.error("Token or userId not found. User is not logged in.");
                 setUserId(null);
                 setPets([]);
                 setEventsData({});
+                setIsLoading(false); // หยุดการโหลด
                 return;
             }
 
             try {
-                const decoded = jwtDecode(token);
-                const currentUserId = decoded.id;
                 setUserId(currentUserId);
 
                 // ดึงข้อมูลสัตว์เลี้ยงของผู้ใช้
@@ -46,13 +47,8 @@ export default function Calendar() {
                     setPets([]);
                 }
 
-                // ดึงข้อมูลกิจกรรมของผู้ใช้คนนี้ (มีการเพิ่ม Authorization header)
-                const eventsResponse = await fetch(`http://localhost:3002/api/reminders/user/${currentUserId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
+                // ดึงข้อมูลกิจกรรมของผู้ใช้คนนี้
+                const eventsResponse = await fetch(`http://localhost:3002/api/reminders/user/${currentUserId}`, { /* ... */ });
                 if (!eventsResponse.ok) {
                     throw new Error('Failed to fetch events');
                 }
@@ -69,6 +65,8 @@ export default function Calendar() {
 
             } catch (error) {
                 console.error("Failed to fetch data:", error);
+            } finally {
+                setIsLoading(false); // ไม่ว่าจะสำเร็จหรือล้มเหลว ให้หยุดการโหลด
             }
         };
 
@@ -140,6 +138,7 @@ export default function Calendar() {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
+        
         const datetime = form.elements['datetime-local'].value;
         const [date, time] = datetime.split('T');
         const petId = form.elements.petId.value;
@@ -147,12 +146,13 @@ export default function Calendar() {
         const selectedPet = pets.find(pet => pet._id === petId);
         const petName = selectedPet ? selectedPet.name : '';
 
+        // ใช้ userId ที่มาจาก state ซึ่งเป็นค่าที่ถูกต้องตามที่ดึงมา
         const newReminder = {
             title: form.elements.title.value,
             date: date,
             time: time,
             petId: petId,
-            petName: petName,
+           // petName: petName,
             details: form.elements.details.value,
             userId: userId
         };
