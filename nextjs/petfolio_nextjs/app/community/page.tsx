@@ -269,7 +269,7 @@ export default function Community() {
         <div className="pt-20 flex-1 flex flex-col space-y-4 border-l border-r border-gray-300 min-h-screen">
           <div className="w-full space-y-4">
             {posts.length === 0 ? (
-              <p className="text-gray-500">ยังไม่มีโพสต์</p>
+              <p className="p-4 text-center text-gray-500">ยังไม่มีโพสต์</p>
             ) : (
               posts.map((post) => (
                 <div
