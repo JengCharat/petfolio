@@ -36,7 +36,7 @@ router.post("/", upload.array("images", 4), async (req, res) => {
     }
 
     const files = req.files || [];
-    const imagePaths = files.map((file) => `/uploads/${file.filename}`);
+    const imagePaths = files.map((file) => `/uploads/Post/${file.filename}`);
 
     const post = new CommunityPost({
       PostDesc,
