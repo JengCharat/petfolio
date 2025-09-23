@@ -100,6 +100,27 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
+// DELETE post by id
+router.delete("/:id", async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    // ลบโพสต์
+    const deleted = await CommunityPost.findByIdAndDelete(postId);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
 
 
 

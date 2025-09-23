@@ -5,7 +5,7 @@ const communityPostSchema = new mongoose.Schema({
   images: [{ type: String }], 
   pets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pet" }], 
   likes: { type: Number, default: 0 },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "communityComment" }],
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // เชื่อม User
   createdAt: { type: Date, default: Date.now },
 });
