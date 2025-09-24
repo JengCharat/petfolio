@@ -14,6 +14,7 @@ const authRoutes = require("./routes/auth");
 const petRoutes = require("./routes/pets");
 const communityPostRoutes = require("./routes/community");
 
+const remindersRouter = require('./routes/reminder');
 const app = express();
 
 // Connect to MongoDB
@@ -53,6 +54,9 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/uploads", express.static("uploads")); // ให้เข้าถึงรูป
 app.use("/api/community-posts", communityPostRoutes);
+app.use('/api/reminders', remindersRouter);
+
+
 
 // Catch 404
 app.use(function (req, res, next) {
