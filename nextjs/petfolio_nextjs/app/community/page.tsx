@@ -128,7 +128,7 @@ export default function Community() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#f5f5f5]">
+    <div className="font-sans flex flex-col min-h-screen w-full bg-[#f5f5f5]">
       <Navbar />
 
       <div className="flex px-48 gap-4 items-start">
@@ -271,54 +271,68 @@ export default function Community() {
         </div>
 
         {/* Main Feed */}
-        <div className="pt-20 flex-1 flex flex-col space-y-4 border-l border-r border-gray-300 min-h-screen">
-          <div className="w-full space-y-4">
-            {posts.length === 0 ? (
-              <p className="p-4 text-center text-gray-500">ยังไม่มีโพสต์</p>
-            ) : (
-              posts.map((post) => (
-                <div
-                  key={post._id}
-                  className="relative border-gray-300 border-b py-4 space-y-3"
-                >
-                  {/* Delete Button */}
-                  {post.owner === currentUser?._id && (
-                    <button
-                      onClick={() => handleDelete(post._id)}
-                      className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                    >
-                      ลบ
-                    </button>
-                  )}
+<div className="pt-20 flex-1 flex flex-col space-y-6 border-l border-r border-gray-300 min-h-screen">
+  <div className="w-full space-y-6">
+    {posts.length === 0 ? (
+      <p className="p-4 text-center text-gray-500">ยังไม่มีโพสต์</p>
+    ) : (
+      posts.map((post) => (
+        <div
+          key={post._id}
+          className="relative border-gray-300 border-b pb-6"
+        >
+          {/* Delete Button */}
+          {post.owner === currentUser?._id && (
+            <button
+              onClick={() => handleDelete(post._id)}
+              className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+            >
+              ลบ
+            </button>
+          )}
 
-                  <p className="font-bold text-lg pl-4 text-black">
-                    {post.pets.map((p: any) => p.name).join(", ")}
-                  </p>
-                  <p className="text-gray-800 text-base pl-8">{post.PostDesc}</p>
+          {/* Username */}
+          <p className="pt-4 font-semibold text-lg text-black pl-4">
+             {post.ownerUsername}
+          </p>
 
-                  {post.images.length > 0 && (
-                    <div className="p-4 flex flex-wrap gap-2">
-                      {post.images.map((img: string, idx: number) => (
-                        <img
-                          key={idx}
-                          src={`http://localhost:3002${img}`}
-                          alt={`post-${idx}`}
-                          className={`cursor-pointer object-cover rounded-xl ${
-                            post.images.length === 1
-                              ? "w-full h-64"
-                              : "w-[49%] h-48"
-                          }`}
-                          onClick={() =>
-                            setOpenImage(`http://localhost:3002${img}`)
-                          }
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
+          
+
+          {/* Description */}
+          <p className="text-gray-800 text-base pl-4 mt-2">{post.PostDesc}</p>
+
+          {/* Images */}
+          {post.images.length > 0 && (
+            <div className="p-4 flex flex-wrap gap-3 mt-3">
+              {post.images.map((img: string, idx: number) => (
+                <img
+                  key={idx}
+                  src={`http://localhost:3002${img}`}
+                  alt={`post-${idx}`}
+                  className={`cursor-pointer object-cover rounded-xl ${
+                    post.images.length === 1
+                      ? "w-full h-64"
+                      : "w-[49%] h-48"
+                  }`}
+                  onClick={() =>
+                    setOpenImage(`http://localhost:3002${img}`)
+                  }
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pets */}
+          {post.pets.length > 0 && (
+            <p className="pr-4 text-gray-700 text-base pl-4 mt-1 text-right">
+              ชื่อสัตว์เลี้ยง: {post.pets.map((p: any) => p.name).join(", ")}
+            </p>
+          )}
+
+        </div>
+      ))
+    )}
+  </div>
 
           {/* Lightbox */}
           {openImage && (
@@ -336,7 +350,7 @@ export default function Community() {
         </div>
 
         {/* My Posts */}
-        <div className="w-64 px-4 pt-22 top-32 self-start">
+        <div className="w-64 px-4 pt-24 top-32 self-start">
           <p className="text-black font-bold mb-4">โพสต์ของฉัน</p>
           <div className="space-y-4">
             {currentUser ? (

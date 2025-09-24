@@ -67,7 +67,14 @@ router.post("/", (req, res) => {
         .populate("pets")
         .populate({ path: "owner", select: "username userId" });
 
-      res.status(201).json(populatedPost);
+      // ✅ เพิ่ม ownerUsername ให้ frontend
+      const postWithUsername = {
+        ...populatedPost.toObject(),
+        ownerUsername: populatedPost.owner ? populatedPost.owner.username : "Unknown",
+      };
+
+      res.status(201).json(postWithUsername);
+
     } catch (err) {
       console.error("❌ Error creating post:", err);
       res.status(500).json({ error: err.message });
