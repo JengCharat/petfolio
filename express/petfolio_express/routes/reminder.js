@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 // เพิ่มกิจกรรมใหม่ (POST)
 router.post('/', async (req, res) => {
-  const reminder = new Reminder({
+  const reminder = new Reminder({ 
     title: req.body.title,
     date: req.body.date,
     time: req.body.time,
@@ -40,6 +40,20 @@ router.get("/user/:userId", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+router.delete("/:reminderId", async (req,res) =>{
+  try{
+    const {reminderId} = req.params;
+    const result = await Reminder.findByIdAndDelete(reminderId);
+    if (!result){
+      return res.status(404).json({ message : "Reminder not found"});
+    }
+    res.json({message:"Reminder delete"});
+  } catch (err){
+      res.status(500).json({message: err.message});
+  }
+
 });
 
 module.exports = router;

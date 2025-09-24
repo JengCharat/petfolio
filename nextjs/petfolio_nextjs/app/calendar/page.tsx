@@ -13,11 +13,10 @@ export default function Calendar() {
     const [pets, setPets] = useState([]);
     const [userId, setUserId] = useState(null);
     const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
-
+    const [selectedDate, setSelectedDate] = useState(null); //เพิ่มคลิกในปฎิทิน
     useEffect(() => {
         const fetchUserData = async () => {
             const token = localStorage.getItem('token');
-            // แก้ไข: ดึง userId ที่เป็น String มาจาก localStorage
             const currentUserId = localStorage.getItem('userId');
 
             if (!token || !currentUserId) {
@@ -120,7 +119,11 @@ export default function Calendar() {
             const dayEvents = eventsData[dateStr] || [];
 
             calendarDays.push(
-                <div key={day} className="p-2 border border-gray-200 rounded-lg h-24 relative overflow-hidden">
+                <div
+                    key={day}
+                    className="p-2 border border-gray-200 rounded-lg h-24 relative overflow-hidden cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleDayClick(dateStr)} // <--- เพิ่ม onClick ที่นี่
+                >
                     <div className="font-bold text-gray-800">{day}</div>
                     <div className="mt-1 space-y-1">
                         {dayEvents.map((event, index) => (
@@ -133,12 +136,13 @@ export default function Calendar() {
             );
         }
         return calendarDays;
+
     };
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        
+
         const datetime = form.elements['datetime-local'].value;
         const [date, time] = datetime.split('T');
         const petId = form.elements.petId.value;
@@ -152,7 +156,7 @@ export default function Calendar() {
             date: date,
             time: time,
             petId: petId,
-           // petName: petName,
+            // petName: petName,
             details: form.elements.details.value,
             userId: userId
         };
@@ -178,7 +182,29 @@ export default function Calendar() {
             alert("เกิดข้อผิดพลาดในการบันทึกกิจกรรม");
         }
     };
+    const handleDayClick = (dateStr) => { //เรียกใช้เวลากดบนปฎิทิน
+        setSelectedDate(`${dateStr}T00:00`);
+        showReminderModal();
+    };
 
+    const handleDeleteReminder = async (reminderId) => {
+        if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบการแจ้งเตือนนี้?")) {
+            try {
+                const response = await fetch(`http://localhost:3002/api/reminders/${reminderId}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete reminder');
+                }
+                window.location.reload();
+
+            } catch (error) {
+                console.error("Failed to delete reminder:", error);
+                alert("เกิดข้อผิดพลาดในการลบกิจกรรม");
+            }
+        }
+    };
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
     const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -228,10 +254,13 @@ export default function Calendar() {
                                     <div key={index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
                                         <div className="text-2xl text-orange-500">⏰</div>
                                         <div className="flex-1">
-                                            <p className="font-medium text-gray-800">{event.title} - **{event.petName}**</p>
+                                            <p className="font-medium text-gray-800">{event.title} - **{event.petId.name}**</p>
                                             <p className="text-sm text-gray-600">วันที่: {event.date} เวลา: {event.time}</p>
                                         </div>
-                                        <button onClick={() => handleViewDetails(event)} className="text-blue-600 hover:text-blue-800 transition-colors" >ดูรายละเอียด</button>
+                                        <div className="flex space-x-2">
+                                            <button onClick={() => handleViewDetails(event)} className="text-blue-600 hover:text-blue-800 transition-colors" >ดูรายละเอียด</button>
+                                            <button onClick={() => handleDeleteReminder(event._id)} className="text-red-600 hover:text-red-800 transition-colors">ลบ</button>
+                                        </div>
                                     </div>
                                 ))
                             ) : (
@@ -265,7 +294,14 @@ export default function Calendar() {
                             </div>
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">วันที่และเวลา *</label>
-                                <input type="datetime-local" name="datetime-local" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" required />
+                                <input
+                                    type="datetime-local"
+                                    name="datetime-local"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500"
+                                    value={selectedDate || ''} // <--- ใช้ 'value' แทน 'defaultValue'
+                                    onChange={(e) => setSelectedDate(e.target.value)} // <--- เพิ่ม onChange handler
+                                    required
+                                />
                             </div>
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">รายละเอียด</label>
@@ -284,7 +320,7 @@ export default function Calendar() {
                     <div className="bg-white rounded-2xl max-w-xl w-full p-8 shadow-2xl">
                         <h3 className="text-2xl font-bold text-gray-800 mb-6">รายละเอียดกิจกรรม</h3>
                         <p>ชื่อกิจกรรม: {selectedEvent.title}</p>
-                        <p>สัตว์เลี้ยง: {selectedEvent.petName}</p>
+                        <p>สัตว์เลี้ยง: {selectedEvent.petId.name}</p>
                         <p>วันที่: {selectedEvent.date}</p>
                         <p>เวลา: {selectedEvent.time}</p>
                         <p>รายละเอียด: {selectedEvent.details}</p>
@@ -292,6 +328,11 @@ export default function Calendar() {
                             onClick={() => setIsDetailModalOpen(false)}
                             className="mt-4 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50">
                             ปิด
+                        </button>
+                        <button
+                            onClick={() => handleDeleteReminder(selectedEvent._id)}
+                            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl">
+                            ลบ
                         </button>
                     </div>
                 </div>
