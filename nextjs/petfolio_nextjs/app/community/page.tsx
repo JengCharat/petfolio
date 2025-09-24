@@ -83,7 +83,12 @@ export default function Community() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Failed to create post");
+     if (!res.ok) {
+      const data = await res.json();
+      // ✅ แสดงป็อปอัป error
+      alert(data.error);
+      return;
+    }
 
       const newPost = await res.json();
       setPosts((prev) => [newPost, ...prev]);

@@ -19,47 +19,62 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { files: 4 } });
 
 // 📌 สร้างโพสต์ใหม่
-router.post("/", upload.array("images", 4), async (req, res) => {
-  try {
-    const { PostDesc, pets, owner } = req.body;
-
-    // หา user ด้วย userId (string)
-    const user = await User.findOne({ userId: owner });
-    if (!user) return res.status(400).json({ error: "User not found" });
-
-    // ตรวจสอบ pets ของ user
-    let validPets = [];
-    if (pets) {
-      const petIds = Array.isArray(pets) ? pets : [pets];
-      validPets = await Pet.find({
-        _id: { $in: petIds },
-        owner: user._id, // owner เป็น ObjectId
+router.post("/", (req, res) => {
+  // upload.array("images", 4) จะ limit ไฟล์สูงสุด 4
+  upload.array("images", 4)(req, res, async (err) => {
+    if (err) {
+    if (err.code === "LIMIT_FILE_COUNT") {
+      // ไฟล์เกิน 4
+      return res.status(400).json({
+        error: "คุณสามารถอัปโหลดได้สูงสุด 4 รูปเท่านั้น",
       });
     }
-
-    const files = req.files || [];
-    const imagePaths = files.map((file) => `/uploads/Post/${file.filename}`);
-
-    const post = new CommunityPost({
-      PostDesc,
-      images: imagePaths,
-      pets: validPets.map((p) => p._id),
-      owner: user._id, // เก็บ ObjectId ของ user
-    });
-
-    await post.save();
-
-    // populate pets และ owner
-    const populatedPost = await CommunityPost.findById(post._id)
-      .populate("pets")
-      .populate({ path: "owner", select: "username userId" });
-
-    res.status(201).json(populatedPost);
-  } catch (err) {
-    console.error("❌ Error creating post:", err);
-    res.status(500).json({ error: err.message });
+    // กรณีอื่น
+    return res.status(500).json({ error: err.message });
   }
+
+    try {
+      const { PostDesc, pets, owner } = req.body;
+
+      // หา user ด้วย userId (string)
+      const user = await User.findOne({ userId: owner });
+      if (!user) return res.status(400).json({ error: "User not found" });
+
+      // ตรวจสอบ pets ของ user
+      let validPets = [];
+      if (pets) {
+        const petIds = Array.isArray(pets) ? pets : [pets];
+        validPets = await Pet.find({
+          _id: { $in: petIds },
+          owner: user._id,
+        });
+      }
+
+      const files = req.files || [];
+      const imagePaths = files.map((file) => `/uploads/Post/${file.filename}`);
+
+      const post = new CommunityPost({
+        PostDesc,
+        images: imagePaths,
+        pets: validPets.map((p) => p._id),
+        owner: user._id,
+      });
+
+      await post.save();
+
+      // populate pets และ owner
+      const populatedPost = await CommunityPost.findById(post._id)
+        .populate("pets")
+        .populate({ path: "owner", select: "username userId" });
+
+      res.status(201).json(populatedPost);
+    } catch (err) {
+      console.error("❌ Error creating post:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
 });
+
 
 // 📌 ดึงโพสต์ทั้งหมด
 router.get("/", async (req, res) => {
