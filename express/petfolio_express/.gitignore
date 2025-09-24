@@ -1,5 +1,5 @@
 # ignore ทุกไฟล์ใน Post/
 express/petfolio_express/uploads/Post/*
 
-# แต่ยังคงโฟลเดอร์เอาไว้
+# แต่ยังคงโฟลเดอร์ไว้
 !express/petfolio_express/uploads/Post/.gitkeep
