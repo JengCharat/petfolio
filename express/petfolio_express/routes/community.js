@@ -1,9 +1,11 @@
+
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const CommunityPost = require("../models/communityPost");
 const Pet = require("../models/pet");
 const User = require("../models/User");
+const fs = require("fs");
 
 const router = express.Router();
 
@@ -105,22 +107,50 @@ router.delete("/:id", async (req, res) => {
   try {
     const postId = req.params.id;
 
-    // ลบโพสต์
-    const deleted = await CommunityPost.findByIdAndDelete(postId);
+    // หาโพสต์ก่อน
+    const post = await CommunityPost.findById(postId);
 
-    if (!deleted) {
+    if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    res.json({ message: "Post deleted successfully" });
+    // ถ้ามีรูปภาพในโพสต์ (หลายรูป)
+    if (Array.isArray(post.images) && post.images.length > 0) {
+      post.images.forEach((imgPath) => {
+        // ✅ ดึงชื่อไฟล์ เช่น "abc.jpg"
+        const fileName = path.basename(imgPath);
+
+        // ✅ ชี้ตรงไปยังโฟลเดอร์ที่เก็บรูป
+        const filePath = path.join(
+          process.cwd(),
+          
+          "uploads",
+          "Post",
+          fileName
+        );
+
+        console.log("🟡 Trying to delete:", filePath);
+
+        // ✅ ลบไฟล์จริง
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("❌ Error deleting image:", err.message);
+          } else {
+            console.log("✅ Deleted image:", filePath);
+          }
+        });
+      });
+    }
+
+    // ลบโพสต์ออกจาก DB
+    await CommunityPost.findByIdAndDelete(postId);
+
+    res.json({ message: "Post and all images deleted successfully" });
   } catch (error) {
     console.error("Error deleting post:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
-
 
 
 
