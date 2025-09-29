@@ -21,9 +21,9 @@ export default function Navbar() {
             <div className="text-3xl">🐾</div>
             <div>
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                PetCare
+                Petfolio
               </span>
-              <span className="text-sm text-gray-500 block -mt-1">Pro</span>
+
             </div>
           </div>
 

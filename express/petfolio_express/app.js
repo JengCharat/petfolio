@@ -12,7 +12,12 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const petRoutes = require("./routes/pets");
+<<<<<<< HEAD
 const remindersRouter = require('./routes/reminder');
+=======
+const communityPostRoutes = require("./routes/community");
+
+>>>>>>> 2ce8719d31b880059f79211439bab2236480fb9e
 const app = express();
 
 // Connect to MongoDB
@@ -50,9 +55,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+<<<<<<< HEAD
 app.use('/api/reminders', remindersRouter);
 
 
+=======
+app.use("/uploads", express.static("uploads")); // ให้เข้าถึงรูป
+app.use("/api/community-posts", communityPostRoutes);
+>>>>>>> 2ce8719d31b880059f79211439bab2236480fb9e
 
 // Catch 404
 app.use(function (req, res, next) {
