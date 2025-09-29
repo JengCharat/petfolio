@@ -39,31 +39,31 @@ const handleRegister = async () => {
 
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Register</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[#f5f5f5]">
+      <h1 className="text-2xl font-bold mb-4 text-black">Register</h1>
       <input
-        className="border p-2 mb-2 w-64"
+        className="border p-2 mb-2 w-64 text-black"
         placeholder="Username"
         type="text"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
       <input
-        className="border p-2 mb-2 w-64"
+        className="border p-2 mb-2 w-64 text-black"
         placeholder="Email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <input
-        className="border p-2 mb-2 w-64"
+        className="border p-2 mb-2 w-64 text-black"
         placeholder="Password"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
       <input
-        className="border p-2 mb-4 w-64"
+        className="border p-2 mb-4 w-64 text-black"
         placeholder="Confirm Password"
         type="password"
         value={confirmPassword}
