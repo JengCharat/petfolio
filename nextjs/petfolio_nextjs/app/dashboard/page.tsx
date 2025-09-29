@@ -21,6 +21,10 @@ export default function First_page() {
         const GotoComunityPage = () => {
            router.push('community') 
         }
+
+        const GotoHealthPage = () => {
+           router.push('health') 
+        }
   //
 const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -284,9 +288,14 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
                         </div>
                     </div>
                 )}
+
+            <button  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg" onClick={GotoHealthPage}>
+                บันทึกสุขภาพ
+            </button>
             <button  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg" onClick={GotoComunityPage}>
                 คอมมูนิตี้สัตว์เลี้ยง
             </button>
+
         </>
       );
 }
