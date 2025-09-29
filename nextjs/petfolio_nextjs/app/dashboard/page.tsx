@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import { jwtDecode } from "jwt-decode";
 import { addPetService } from "../services/pet_page_service";
+import { useRouter } from 'next/navigation'
+import { Router } from "next/router";
 interface JWTData {
   id: string;
   email: string;
@@ -15,7 +16,11 @@ interface JWTData {
 
 
 export default function First_page() {
+    const router = useRouter()
   const [userEmail, setUserEmail] = useState("");
+        const GotoComunityPage = () => {
+           router.push('community') 
+        }
   //
 const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,6 +47,12 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
       alert("ไม่สามารถเพิ่มสัตว์เลี้ยงได้");
     }
   };
+ const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+    };
 
    
     const [showModal, setShowModal] = useState(false);
@@ -273,6 +284,9 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
                         </div>
                     </div>
                 )}
+            <button  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg" onClick={GotoComunityPage}>
+                คอมมูนิตี้สัตว์เลี้ยง
+            </button>
         </>
       );
 }
