@@ -20,7 +20,8 @@ router.post('/', async (req, res) => {
     time: req.body.time,
     petId: req.body.petId, // <--- แก้ไขจาก petName เป็น petId
     details: req.body.details,
-    userId: req.body.userId
+    userId: req.body.userId,
+    completed: false, //<--- ให้มันเก็บค่า เพื่อให้ปุ่มทำงานนะงับ
   });
 
   try {
@@ -54,6 +55,28 @@ router.delete("/:reminderId", async (req,res) =>{
       res.status(500).json({message: err.message});
   }
 
+});
+// ทำเครื่องหมายกิจกรรมว่าเสร็จแล้ว (POST) < เพื่อให้ปุุ่มส่งและทำงานได้
+
+router.post('/:id/complete', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    // อัปเดต completed เป็น true
+    const reminder = await Reminder.findOneAndUpdate(
+      { _id: id, userId },
+      { completed: true },
+      { new: true }
+    );
+
+    if (!reminder) return res.status(404).json({ error: "ไม่พบการแจ้งเตือนนี้" });
+
+    res.json({ message: "ทำเครื่องหมายเสร็จแล้ว", reminder });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาด" });
+  }
 });
 
 module.exports = router;

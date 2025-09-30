@@ -22,6 +22,10 @@ const reminderSchema = new mongoose.Schema({
   userId: {
     type: String,
     required: true
+  },
+  completed: {           // <-- เพิ่ม Completed เพื่อให้สถานะเปลี่ยนได้
+    type: Boolean,
+    default: false
   }
 });
 
