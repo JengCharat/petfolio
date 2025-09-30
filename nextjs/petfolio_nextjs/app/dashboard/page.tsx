@@ -17,6 +17,7 @@ interface JWTData {
 
 export default function First_page() {
     const router = useRouter()
+
   const [userEmail, setUserEmail] = useState("");
         const GotoComunityPage = () => {
            router.push('community') 
@@ -30,6 +31,7 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const userId = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
+
 
     if (!userId || !token) {
       alert("กรุณา login ก่อน");
@@ -91,12 +93,128 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
       }
     }
     });
+
+
+
+
+
+
+
+
+    const [userId, setUserId] = useState(null);
+    const [pets, setPets] = useState([]);
+    const [eventsData, setEventsData] = useState({});
+    const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = localStorage.getItem('token');
+            const currentUserId = localStorage.getItem('userId');
+
+            if (!token || !currentUserId) {
+                console.error("Token or userId not found. User is not logged in.");
+                setUserId(null);
+                setPets([]);
+                setEventsData({});
+                setIsLoading(false); // หยุดการโหลด
+                return;
+            }
+
+            try {
+
+                // ดึงข้อมูลสัตว์เลี้ยงของผู้ใช้
+                const petsResponse = await fetch(`http://localhost:3002/api/pets/user/${currentUserId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (petsResponse.ok) {
+                    const petsData = await petsResponse.json();
+                    setPets(petsData);
+                } else {
+                    console.error(`Failed to fetch pets: ${petsResponse.status}`);
+                    setPets([]);
+                }
+
+                // ดึงข้อมูลกิจกรรมของผู้ใช้คนนี้
+                const eventsResponse = await fetch(`http://localhost:3002/api/reminders/user/${currentUserId}`, { /* ... */ });
+                if (!eventsResponse.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const data = await eventsResponse.json();
+                const formattedData = data.reduce((acc, event) => {
+                    const dateKey = event.date;
+                    if (!acc[dateKey]) {
+                        acc[dateKey] = [];
+                    }
+                    acc[dateKey].push(event);
+                    return acc;
+                }, {});
+                setEventsData(formattedData);
+
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            } finally {
+                setIsLoading(false); // ไม่ว่าจะสำเร็จหรือล้มเหลว ให้หยุดการโหลด
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+
+
+
+
+
+
+
+
+    const [petCount,setPetCount] = useState(0)
+    useEffect(()=>{
+        const fetchPetCount = async () => {
+            try{
+                const res = await fetch('http://127.0.0.1:3002/api/pets/petcount/9PefA6P1uQMHjdCisXQZk')
+                if(!res.ok){
+                    throw new Error('Fail to fetch')
+                }
+                const result = await res.json()
+                setPetCount(result)
+        }catch(err){
+                alert(err)
+            }
+        }
+        fetchPetCount()
+
+    },[])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       return (
         <>
           <Navbar />
           {userEmail && (
             <p className="mb-2 text-green-600">Logged in as: {userEmail}</p>
           )}
+            <h1 className="text-red-200 text-3xl">this is pet count: {petCount}</h1>
 
                     <button
                         onClick={() => {
@@ -295,6 +413,36 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
             <button  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg" onClick={GotoComunityPage}>
                 คอมมูนิตี้สัตว์เลี้ยง
             </button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         </>
       );

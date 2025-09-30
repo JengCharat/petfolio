@@ -13,6 +13,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+router.get("/petcount/:userId",async (req,res)=>{
+
+      const { userId } = req.params;
+    try{
+    // หา User ใน backend
+    const user = await User.findOne({ userId }); // หรือ _id: userId ถ้า frontend ส่ง _id
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // query pets ของ user
+    const pets_count = await Pet.countDocuments(Pet.find({ owner: user._id }).populate("owner", "username email"));
+
+    res.json(pets_count); // ส่งกลับเป็น array
+    }
+    catch(err){
+        res.status(500).json({ error: err.message})
+    }
+
+})
+
+
+
 // GET /api/pets/user/:userId → ดึงสัตว์ของผู้ใช้คนเดียว
 router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
