@@ -17,52 +17,13 @@ interface JWTData {
 
 export default function First_page() {
     const router = useRouter()
-
-  const [userEmail, setUserEmail] = useState("");
-        const GotoComunityPage = () => {
-           router.push('community') 
-        }
-
-        const GotoHealthPage = () => {
-           router.push('health') 
-        }
-  //
-const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
-
-
-    if (!userId || !token) {
-      alert("กรุณา login ก่อน");
-      return;
-    }
-
-    try {
-      const savedPet = await addPetService(form, token, userId);
-
-      if (String(savedPet.pet.owner?._id) === String(userId)) {
-        setPets(prev => [...prev, savedPet.pet]);
-      }
-
-      setShowModal(false);
-      setForm({ name:"", type:"", breed:"", birthdate:"", weight:"", gender:"", personality:"", medicalConditions:"", privacy:"private" });
-
-    } catch (err) {
-      console.error(err);
-      alert("ไม่สามารถเพิ่มสัตว์เลี้ยงได้");
-    }
-  };
- const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
-    };
-
-   
+    const [userEmail, setUserEmail] = useState("");
     const [showModal, setShowModal] = useState(false);
-
+    const [userId, setUserId] = useState(null);
+    const [pets, setPets] = useState([]);
+    const [eventsData, setEventsData] = useState({});
+    const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
+    const [petCount,setPetCount] = useState(0)
     const [form, setForm] = useState({
         name: "",
         type: "" as string,
@@ -74,104 +35,80 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
         medicalConditions: "",
         privacy: "private",
     });
-  useEffect(() => {
-    // อ่าน token จาก localStorage
-    const tokenRaw = localStorage.getItem("token");
-    if (tokenRaw) {
-      // ถ้า token เก็บมาแบบ "Bearer <token>" ให้ตัดคำว่า Bearer ออก
-      const token = tokenRaw.startsWith("Bearer ")
-        ? tokenRaw.split(" ")[1]
-        : tokenRaw;
-      try {
-        const decoded = jwtDecode<JWTData>(token);
-        if (decoded?.email) {
-          setUserEmail(decoded.email);
-          // alert(`Logged in as: ${decoded.email}`); // ถ้าต้องการ alert
-        }
-      } catch (err) {
-        console.error("Invalid token", err);
-      }
+    /////////////////////////////this is route //////////////////////////////////
+    const GotoComunityPage = () => {
+       router.push('community') 
     }
-    });
+    const GotoHealthPage = () => {
+       router.push('health') 
+    }
 
 
 
 
+    /////////////////////////////this is handle click //////////////////////////////////
+    const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token");
+
+
+        if (!userId || !token) {
+          alert("กรุณา login ก่อน");
+          return;
+        }
+
+        try {
+          const savedPet = await addPetService(form, token, userId);
+
+          if (String(savedPet.pet.owner?._id) === String(userId)) {
+            setPets(prev => [...prev, savedPet.pet]);
+          }
+
+          setShowModal(false);
+          setForm({ name:"", type:"", breed:"", birthdate:"", weight:"", gender:"", personality:"", medicalConditions:"", privacy:"private" });
+
+        } catch (err) {
+          console.error(err);
+          alert("ไม่สามารถเพิ่มสัตว์เลี้ยงได้");
+        }
+      };
 
 
 
-
-    const [userId, setUserId] = useState(null);
-    const [pets, setPets] = useState([]);
-    const [eventsData, setEventsData] = useState({});
-    const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const token = localStorage.getItem('token');
-            const currentUserId = localStorage.getItem('userId');
-
-            if (!token || !currentUserId) {
-                console.error("Token or userId not found. User is not logged in.");
-                setUserId(null);
-                setPets([]);
-                setEventsData({});
-                setIsLoading(false); // หยุดการโหลด
-                return;
-            }
-
-            try {
-
-                // ดึงข้อมูลสัตว์เลี้ยงของผู้ใช้
-                const petsResponse = await fetch(`http://localhost:3002/api/pets/user/${currentUserId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                if (petsResponse.ok) {
-                    const petsData = await petsResponse.json();
-                    setPets(petsData);
-                } else {
-                    console.error(`Failed to fetch pets: ${petsResponse.status}`);
-                    setPets([]);
-                }
-
-                // ดึงข้อมูลกิจกรรมของผู้ใช้คนนี้
-                const eventsResponse = await fetch(`http://localhost:3002/api/reminders/user/${currentUserId}`, { /* ... */ });
-                if (!eventsResponse.ok) {
-                    throw new Error('Failed to fetch events');
-                }
-                const data = await eventsResponse.json();
-                const formattedData = data.reduce((acc, event) => {
-                    const dateKey = event.date;
-                    if (!acc[dateKey]) {
-                        acc[dateKey] = [];
-                    }
-                    acc[dateKey].push(event);
-                    return acc;
-                }, {});
-                setEventsData(formattedData);
-
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-            } finally {
-                setIsLoading(false); // ไม่ว่าจะสำเร็จหรือล้มเหลว ให้หยุดการโหลด
-            }
+     const handleChange = (
+            e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+        ) => {
+            const { name, value } = e.target;
+            setForm({ ...form, [name]: value });
         };
 
-        fetchUserData();
-    }, []);
+   
+
+    /////////////////////////////this is fetch data //////////////////////////////////
+      useEffect(() => {
+        // อ่าน token จาก localStorage
+        const tokenRaw = localStorage.getItem("token");
+        if (tokenRaw) {
+          // ถ้า token เก็บมาแบบ "Bearer <token>" ให้ตัดคำว่า Bearer ออก
+          const token = tokenRaw.startsWith("Bearer ")
+            ? tokenRaw.split(" ")[1]
+            : tokenRaw;
+          try {
+            const decoded = jwtDecode<JWTData>(token);
+            if (decoded?.email) {
+              setUserEmail(decoded.email);
+              // alert(`Logged in as: ${decoded.email}`); // ถ้าต้องการ alert
+            }
+          } catch (err) {
+            console.error("Invalid token", err);
+          }
+        }
+        });
 
 
 
 
-
-
-
-
-
-    const [petCount,setPetCount] = useState(0)
     useEffect(()=>{
         const fetchPetCount = async () => {
             try{
@@ -195,19 +132,8 @@ const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    /////////////////////////////this is return//////////////////////////////////
       return (
         <>
           <Navbar />
