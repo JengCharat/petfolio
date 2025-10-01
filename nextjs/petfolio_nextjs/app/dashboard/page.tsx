@@ -55,8 +55,10 @@ export default function First_page() {
     const [eventsData, setEventsData] = useState({});
     const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
     const [petCount, setPetCount] = useState<{ [key: string]: number }>({});
+ const [pendingCount, setPendingCount] = useState<number>(0);
   const [reminders, setReminders] = useState<ReminderType[]>([]);
   const [completedReminders, setCompletedReminders] = useState<ReminderType[]>([]);
+const [latestReminders, setLatestReminders] = useState<ReminderType[]>([]);
   const now = new Date();
     const [form, setForm] = useState({
         name: "",
@@ -235,6 +237,43 @@ export default function First_page() {
                     };
                     fetchReminders();
 
+
+
+
+
+
+
+            const fetchNotFinishedReminders = async () => {
+            try {
+            const userId = localStorage.getItem("userId");
+            if (!userId) return;
+
+            const res = await fetch(`http://localhost:3002/api/reminders/user/${userId}`);
+            if (!res.ok) throw new Error("Failed to fetch reminders");
+
+            const data: ReminderType[] = await res.json();
+
+            // ✅ กรองงานที่ยังไม่เสร็จ
+            const notDone = data.filter((r) => !r.completed);
+            setPendingCount(notDone.length);
+
+            // ✅ เอา 3 อันล่าสุด
+            const latest = data
+            .sort(
+            (a, b) =>
+              new Date(b.date + " " + b.time).getTime() -
+              new Date(a.date + " " + a.time).getTime()
+            )
+            .slice(0, 3);
+
+            setLatestReminders(latest);
+            } catch (err) {
+            console.error(err);
+            }
+            };
+
+            fetchNotFinishedReminders()
+
               } catch (error: unknown) {
                 console.error(error);
                 setPets([]);
@@ -274,31 +313,41 @@ export default function First_page() {
             <div className="text-lg font-bold text-blue-600">สัปดาห์นี้</div>
             <div className="text-sm text-blue-500">{countThisWeek} รายการ</div>
           </div>
-        <section className="mt-6">
-          <h2 className="text-2xl font-bold text-pink-500 mb-4">🛎 แจ้งเตือนล่าสุด</h2>
-          {reminders.length === 0 ? (
-            <p className="text-yellow-400 font-semibold">ไม่มีแจ้งเตือน</p>
-          ) : (
-            <ul className="space-y-3">
-              {reminders.map((reminder, index) => (
-                <li
-                  key={reminder._id}
-                  className={`p-3 rounded-xl shadow-lg border
-                    ${index % 2 === 0 ? "bg-cyan-900/40" : "bg-green-900/40"}
-                  `}
-                >
-                  <p className="text-yellow-400 font-bold text-lg">
-                    {reminder.title}
-                  </p>
-                  <p className="text-cyan-300 text-sm">
-                    {reminder.date} {reminder.time}
-                  </p>
-                  <p className="text-green-400">{reminder.details}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+            <section className="mt-6 space-y-6">
+                  {/* การ์ดงานที่ยังไม่เสร็จ */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center shadow">
+                    <div className="text-2xl mb-2">📌</div>
+                    <div className="text-lg font-bold text-blue-600">งานที่ยังไม่เสร็จ</div>
+                    <div className="text-sm text-blue-500">{pendingCount} รายการ</div>
+                  </div>
+
+                  {/* แจ้งเตือนล่าสุด */}
+                  <div>
+                    <h2 className="text-2xl font-bold text-pink-500 mb-4">🛎 แจ้งเตือนล่าสุด</h2>
+                    {latestReminders.length === 0 ? (
+                      <p className="text-yellow-400 font-semibold">ไม่มีแจ้งเตือน</p>
+                    ) : (
+                      <ul className="space-y-3">
+                        {latestReminders.map((reminder, index) => (
+                          <li
+                            key={reminder._id}
+                            className={`p-3 rounded-xl shadow-lg border
+                              ${index % 2 === 0 ? "bg-cyan-900/40" : "bg-green-900/40"}
+                            `}
+                          >
+                            <p className="text-yellow-400 font-bold text-lg">
+                              {reminder.title}
+                            </p>
+                            <p className="text-cyan-300 text-sm">
+                              {reminder.date} {reminder.time}
+                            </p>
+                            <p className="text-green-400">{reminder.details}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </section>
                     <button
                         onClick={() => {
                             setForm({  // รีเซ็ตฟอร์มเป็นค่าเริ่มต้น
