@@ -55,6 +55,9 @@ export default function First_page() {
     const [eventsData, setEventsData] = useState({});
     const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
     const [petCount, setPetCount] = useState<{ [key: string]: number }>({});
+  const [reminders, setReminders] = useState<ReminderType[]>([]);
+  const [completedReminders, setCompletedReminders] = useState<ReminderType[]>([]);
+  const now = new Date();
     const [form, setForm] = useState({
         name: "",
         type: "" as string,
@@ -163,111 +166,70 @@ export default function First_page() {
           fetchPetCount();
         }, []);
 
+            ///////////////////////////////////////count this week task 
 
+          useEffect(() => {
+                const userId = localStorage.getItem("userId");
 
+            const fetchData = async () => {
+              setIsLoading(true);
+              const token = localStorage.getItem("token");
+              try {
 
+                // Fetch Pets
+                const petsRes = await fetch(`http://localhost:3002/api/pets/user/${userId}`, {
+                  headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                const petsData: Pet[] = petsRes.ok ? await petsRes.json() : [];
+                // const formattedPets = petsData.map(p => ({ ...p, emoji: p.emoji || getPetEmoji(p.type) }));
+                // setPets(formattedPets);
 
+                // Fetch Reminders
+                const remRes = await fetch(`http://localhost:3002/api/reminders/user/${userId}`, {
+                  headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                if (!remRes.ok) throw new Error("Failed to fetch reminders");
+                const remData: RawReminder[] = await remRes.json();
 
+                const incomplete: ReminderType[] = [];
+                const completed: ReminderType[] = [];
 
+                remData.forEach((r) => {
+                  const reminderObj: ReminderType = {
+                    _id: r._id,
+                    // petId: pet,
+                    title: r.title || "กิจกรรม",
+                    date: r.date || "",
+                    time: r.time || "",
+                    details: r.details || ""
+                  };
 
-  const [reminders, setReminders] = useState<ReminderType[]>([]);
+                  if (r.completed) completed.push(reminderObj);
+                  else incomplete.push(reminderObj);
+                });
 
-  const [completedReminders, setCompletedReminders] = useState<ReminderType[]>([]);
+                setReminders(incomplete);
+                setCompletedReminders(completed);
 
-  const getPetEmoji = (type?: string) => {
-    switch (type) {
-      case "dog": return "🐶";
-      case "cat": return "🐱";
-      case "bird": return "🐦";
-      case "rabbit": return "🐰";
-      case "hamster": return "🐹";
-      default: return "🐾";
-    }
-  };
-
-  const now = new Date();
-
-  useEffect(() => {
-        const userId = localStorage.getItem("userId");
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      const token = localStorage.getItem("token");
-      try {
-
-        // Fetch Pets
-        const petsRes = await fetch(`http://localhost:3002/api/pets/user/${userId}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const petsData: Pet[] = petsRes.ok ? await petsRes.json() : [];
-        const formattedPets = petsData.map(p => ({ ...p, emoji: p.emoji || getPetEmoji(p.type) }));
-        setPets(formattedPets);
-
-        // Fetch Reminders
-        const remRes = await fetch(`http://localhost:3002/api/reminders/user/${userId}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (!remRes.ok) throw new Error("Failed to fetch reminders");
-        const remData: RawReminder[] = await remRes.json();
-
-        const incomplete: ReminderType[] = [];
-        const completed: ReminderType[] = [];
-
-        remData.forEach((r) => {
-          let pet: Pet | undefined = r.petId
-            ? formattedPets.find(p => p._id === r.petId?._id)
-            : undefined;
-
-          if (!pet) {
-            pet = {
-              _id: "",
-              name: r.petName || "ไม่ทราบ",
-              type: "unknown",
-              emoji: r.petType ? getPetEmoji(r.petType) : "🐾"
+              } catch (error: unknown) {
+                console.error(error);
+                setPets([]);
+                setReminders([]);
+                setCompletedReminders([]);
+              } finally {
+                setIsLoading(false);
+              }
             };
-          }
 
-          const reminderObj: ReminderType = {
-            _id: r._id,
-            petId: pet,
-            title: r.title || "กิจกรรม",
-            date: r.date || "",
-            time: r.time || "",
-            details: r.details || ""
-          };
-
-          if (r.completed) completed.push(reminderObj);
-          else incomplete.push(reminderObj);
-        });
-
-        setReminders(incomplete);
-        setCompletedReminders(completed);
-
-      } catch (error: unknown) {
-        console.error(error);
-        setPets([]);
-        setReminders([]);
-        setCompletedReminders([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [userId]);
-
-
-
-
-
-
-  const countThisWeek = reminders.filter(r => {
-    const datetime = new Date(`${r.date}T${r.time}`);
-    const day = now.getDay();
-    const weekStart = new Date(now); weekStart.setDate(now.getDate() - day); weekStart.setHours(0,0,0,0);
-    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
-    return datetime >= weekStart && datetime <= weekEnd;
-  }).length;
+            fetchData();
+          }, [userId]);
+          const countThisWeek = reminders.filter(r => {
+            const datetime = new Date(`${r.date}T${r.time}`);
+            const day = now.getDay();
+            const weekStart = new Date(now); weekStart.setDate(now.getDate() - day); weekStart.setHours(0,0,0,0);
+            const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
+            return datetime >= weekStart && datetime <= weekEnd;
+          }).length;
     
     /////////////////////////////this is return//////////////////////////////////
       return (
