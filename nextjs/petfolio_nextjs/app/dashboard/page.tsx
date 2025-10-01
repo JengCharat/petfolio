@@ -15,6 +15,37 @@ interface JWTData {
 
 
 
+type PetType = "dog" | "cat" | "bird" | "fish" | "rabbit" | "hamster" | "unknown";
+
+interface Pet {
+  _id: string;
+  name: string;
+  type: PetType;
+  emoji?: string;
+}
+interface ReminderType {
+  _id: string;
+  petId: Pet | null;
+  title: string;
+  date: string;
+  time: string;
+  details: string;
+}
+
+// --- Raw Reminder from API ---
+interface RawReminder {
+  _id: string;
+  petId?: { _id: string } | null;
+  title?: string;
+  date?: string;
+  time?: string;
+  details?: string;
+  completed?: boolean;
+  petName?: string;
+  petType?: string;
+}
+
+
 export default function First_page() {
     const router = useRouter()
     const [userEmail, setUserEmail] = useState("");
@@ -138,6 +169,105 @@ export default function First_page() {
 
 
 
+
+  const [reminders, setReminders] = useState<ReminderType[]>([]);
+
+  const [completedReminders, setCompletedReminders] = useState<ReminderType[]>([]);
+
+  const getPetEmoji = (type?: string) => {
+    switch (type) {
+      case "dog": return "🐶";
+      case "cat": return "🐱";
+      case "bird": return "🐦";
+      case "rabbit": return "🐰";
+      case "hamster": return "🐹";
+      default: return "🐾";
+    }
+  };
+
+  const now = new Date();
+
+  useEffect(() => {
+        const userId = localStorage.getItem("userId");
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      const token = localStorage.getItem("token");
+      try {
+
+        // Fetch Pets
+        const petsRes = await fetch(`http://localhost:3002/api/pets/user/${userId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const petsData: Pet[] = petsRes.ok ? await petsRes.json() : [];
+        const formattedPets = petsData.map(p => ({ ...p, emoji: p.emoji || getPetEmoji(p.type) }));
+        setPets(formattedPets);
+
+        // Fetch Reminders
+        const remRes = await fetch(`http://localhost:3002/api/reminders/user/${userId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!remRes.ok) throw new Error("Failed to fetch reminders");
+        const remData: RawReminder[] = await remRes.json();
+
+        const incomplete: ReminderType[] = [];
+        const completed: ReminderType[] = [];
+
+        remData.forEach((r) => {
+          let pet: Pet | undefined = r.petId
+            ? formattedPets.find(p => p._id === r.petId?._id)
+            : undefined;
+
+          if (!pet) {
+            pet = {
+              _id: "",
+              name: r.petName || "ไม่ทราบ",
+              type: "unknown",
+              emoji: r.petType ? getPetEmoji(r.petType) : "🐾"
+            };
+          }
+
+          const reminderObj: ReminderType = {
+            _id: r._id,
+            petId: pet,
+            title: r.title || "กิจกรรม",
+            date: r.date || "",
+            time: r.time || "",
+            details: r.details || ""
+          };
+
+          if (r.completed) completed.push(reminderObj);
+          else incomplete.push(reminderObj);
+        });
+
+        setReminders(incomplete);
+        setCompletedReminders(completed);
+
+      } catch (error: unknown) {
+        console.error(error);
+        setPets([]);
+        setReminders([]);
+        setCompletedReminders([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [userId]);
+
+
+
+
+
+
+  const countThisWeek = reminders.filter(r => {
+    const datetime = new Date(`${r.date}T${r.time}`);
+    const day = now.getDay();
+    const weekStart = new Date(now); weekStart.setDate(now.getDate() - day); weekStart.setHours(0,0,0,0);
+    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
+    return datetime >= weekStart && datetime <= weekEnd;
+  }).length;
     
     /////////////////////////////this is return//////////////////////////////////
       return (
@@ -153,6 +283,11 @@ export default function First_page() {
             <h1 className="text-red-200 text-3xl">rabbit: {petCount.rabbit || 0}</h1>
             <h1 className="text-red-200 text-3xl">hamster: {petCount.hamster || 0}</h1>
 
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+            <div className="text-2xl mb-2">📅</div>
+            <div className="text-lg font-bold text-blue-600">สัปดาห์นี้</div>
+            <div className="text-sm text-blue-500">{countThisWeek} รายการ</div>
+          </div>
                     <button
                         onClick={() => {
                             setForm({  // รีเซ็ตฟอร์มเป็นค่าเริ่มต้น
