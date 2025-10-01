@@ -17,15 +17,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* โลโก้ */}
-          <div className="flex items-center space-x-3">
-            <div className="text-3xl">🐾</div>
-            <div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                PetCare
-              </span>
-              <span className="text-sm text-gray-500 block -mt-1">Pro</span>
-            </div>
-          </div>
+         <div>
+        <img
+          src="/navlogo.png"
+          alt="Logo"
+          className="w-32 h-auto"  // กำหนดความกว้างและรักษาสัดส่วน
+        />
+      </div>
 
           {/* เมนู */}
           <div className="flex items-center space-x-6">
