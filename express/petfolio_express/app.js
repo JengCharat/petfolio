@@ -12,32 +12,26 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const petRoutes = require("./routes/pets");
+const healthRoutes = require("./routes/health");
+const authMw = require("./middlewares/nextauth-mw");
 
 const app = express();
 
-// Connect to MongoDB
+// ✅ Connect to MongoDB
 connectDB();
 
-// Middleware
+// ✅ CORS ให้ Next.js (3001) เรียกได้
 app.use(
   cors({
-    origin: "*", // เปลี่ยนเป็น http://localhost:3000 ถ้าอยาก fix origin
+    origin: "http://localhost:3001", // หรือ "*" ชั่วคราว
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// สำหรับ preflight OPTIONS requests
-app.options(
-  "*",
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+// ✅ สำหรับ preflight OPTIONS
+app.options("*", cors());
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -45,18 +39,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
+
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
+app.use("/api/health", authMw, healthRoutes);
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
-// Catch 404
+// ✅ Catch 404
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// Error handler
+// ✅ Error handler
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -65,7 +61,7 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Server running at http://localhost:${port}`);
+  console.log(`🚀 Express Server running at http://localhost:${port}`);
 });
 
 module.exports = app;

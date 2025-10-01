@@ -1,4 +1,5 @@
-import mongoose, { Schema, models } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema, models } = mongoose;
 
 const HealthSchema = new Schema({
   userId: { type: String, required: true },
@@ -10,4 +11,5 @@ const HealthSchema = new Schema({
   cost: { type: Number, default: 0 },
 });
 
-export default models.HealthRecord || mongoose.model("HealthRecord", HealthSchema);
+module.exports.HealthRecord =
+  models.HealthRecord || mongoose.model("HealthRecord", HealthSchema);
