@@ -5,7 +5,6 @@ import Navbar from "../components/Navbar";
 
 // --- Types ---
 type PetType = "dog" | "cat" | "bird" | "fish" | "rabbit" | "hamster" | "unknown";
-type FrequencyType = "ครั้งเดียว" | "ทุกวัน" | "ทุกสัปดาห์" | "ทุกเดือน";
 
 interface Pet {
   _id: string;
@@ -20,7 +19,6 @@ interface ReminderType {
   title: string;
   date: string;
   time: string;
-  frequency: FrequencyType;
   details: string;
 }
 
@@ -31,7 +29,6 @@ interface RawReminder {
   title?: string;
   date?: string;
   time?: string;
-  frequency?: FrequencyType;
   details?: string;
   completed?: boolean;
   petName?: string;
@@ -49,7 +46,6 @@ export default function Reminder() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedPetId, setSelectedPetId] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [selectedFrequency, setSelectedFrequency] = useState<FrequencyType>("ครั้งเดียว");
   const [notePlaceholder, setNotePlaceholder] = useState("รายละเอียดเพิ่มเติม...");
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -116,7 +112,6 @@ export default function Reminder() {
             title: r.title || "กิจกรรม",
             date: r.date || "",
             time: r.time || "",
-            frequency: r.frequency || "ครั้งเดียว",
             details: r.details || ""
           };
 
@@ -160,12 +155,12 @@ export default function Reminder() {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userId) return alert("ไม่พบผู้ใช้");
-
+    const isConfirmed = window.confirm("คุณแน่ใจว่าจะบันทึกการแจ้งเตือนนี้ใช่หรือไม่?");
+  if (!isConfirmed) return; // ถ้า user กดยกเลิก ก็ไม่ทำอะไรต่อ
     const form = e.currentTarget;
     const datetimeInput = (form.elements.namedItem("datetime") as HTMLInputElement).value;
     const petId = (form.elements.namedItem("petId") as HTMLSelectElement).value;
     const title = (form.elements.namedItem("type") as HTMLSelectElement).value || "กิจกรรม";
-    const frequency = (form.elements.namedItem("frequency") as HTMLSelectElement).value as FrequencyType;
     const details = (form.elements.namedItem("note") as HTMLTextAreaElement).value || "";
 
     if (!petId) return alert("กรุณาเลือกสัตว์เลี้ยง");
@@ -182,7 +177,7 @@ export default function Reminder() {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ title, date, time, frequency, petId: petObj._id, details, userId }),
+        body: JSON.stringify({ title, date, time, petId: petObj._id, details, userId }),
       });
 
       if (!response.ok) {
@@ -199,7 +194,6 @@ export default function Reminder() {
           title: savedReminder.title || title,
           date: savedReminder.date || date,
           time: savedReminder.time || time,
-          frequency: savedReminder.frequency || frequency,
           details: savedReminder.details || details
         }
       ]);
@@ -208,7 +202,6 @@ export default function Reminder() {
       setSelectedDate("");
       setSelectedPetId("");
       setSelectedType("");
-      setSelectedFrequency("ครั้งเดียว");
       setNotePlaceholder("รายละเอียดเพิ่มเติม...");
       setIsReminderModalOpen(false);
 
@@ -255,7 +248,6 @@ export default function Reminder() {
         title: completedReminder.title || "กิจกรรม",
         date: completedReminder.date || "",
         time: completedReminder.time || "",
-        frequency: completedReminder.frequency || "ครั้งเดียว",
         details: completedReminder.details || ""
       };
 
@@ -337,7 +329,6 @@ export default function Reminder() {
                       <h3 className="font-bold text-gray-800">{r.title}</h3>
                       <p className="text-gray-600">{pet?.name || "ไม่ทราบ"}</p>
                       <p className="text-sm text-gray-500">{datetime.toLocaleString("th-TH")}</p>
-                      <p className="text-sm text-gray-500">ความถี่: {r.frequency}</p>
                       {r.details && <p className="text-sm text-gray-600 mt-1">หมายเหตุ: {r.details}</p>}
                     </div>
                   </div>
@@ -388,26 +379,16 @@ export default function Reminder() {
                   <input type="datetime-local" name="datetime" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} required />
                 </div>
 
-                {/* Frequency */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">ความถี่</label>
-                  <select name="frequency" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedFrequency} onChange={e => setSelectedFrequency(e.target.value as FrequencyType)}>
-                    <option value="ครั้งเดียว">ครั้งเดียว</option>
-                    <option value="ทุกวัน">ทุกวัน</option>
-                    <option value="ทุกสัปดาห์">ทุกสัปดาห์</option>
-                    <option value="ทุกเดือน">ทุกเดือน</option>
-                  </select>
-                </div>
-
                 {/* Note */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">หมายเหตุ</label>
-                  <textarea name="note" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" placeholder={notePlaceholder}></textarea>
+                  <textarea name="note" placeholder={notePlaceholder} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500"></textarea>
                 </div>
 
-                <div className="flex justify-end space-x-4">
-                  <button type="button" onClick={() => setIsReminderModalOpen(false)} className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-100">ยกเลิก</button>
-                  <button type="submit" className="px-6 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700">บันทึก</button>
+                {/* Buttons */}
+                <div className="flex justify-end space-x-4 mt-4">
+                  <button type="button" onClick={() => setIsReminderModalOpen(false)} className="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300">ยกเลิก</button>
+                  <button type="submit" className="px-6 py-3 rounded-xl bg-orange-600 text-white hover:bg-orange-700">บันทึก</button>
                 </div>
               </form>
             </div>
