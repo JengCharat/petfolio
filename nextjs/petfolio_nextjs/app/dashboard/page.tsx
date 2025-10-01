@@ -210,6 +210,30 @@ export default function First_page() {
 
                 setReminders(incomplete);
                 setCompletedReminders(completed);
+                const fetchReminders = async () => {
+                      try {
+                        const userId = localStorage.getItem("userId");
+                        if (!userId) return;
+
+                        const res = await fetch(`http://localhost:3002/api/reminders/user/${userId}`);
+                        if (!res.ok) throw new Error("Failed to fetch reminders");
+
+                        const data = await res.json();
+
+                        // sort ใหม่ให้ล่าสุดอยู่ข้างบน แล้วเอาแค่ 3 ตัว
+                        const latest = data
+                          .sort((a: ReminderType, b: ReminderType) =>
+                            new Date(b.date + " " + b.time).getTime() -
+                            new Date(a.date + " " + a.time).getTime()
+                          )
+                          .slice(0, 3);
+
+                        setReminders(latest);
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    };
+                    fetchReminders();
 
               } catch (error: unknown) {
                 console.error(error);
@@ -250,6 +274,31 @@ export default function First_page() {
             <div className="text-lg font-bold text-blue-600">สัปดาห์นี้</div>
             <div className="text-sm text-blue-500">{countThisWeek} รายการ</div>
           </div>
+        <section className="mt-6">
+          <h2 className="text-2xl font-bold text-pink-500 mb-4">🛎 แจ้งเตือนล่าสุด</h2>
+          {reminders.length === 0 ? (
+            <p className="text-yellow-400 font-semibold">ไม่มีแจ้งเตือน</p>
+          ) : (
+            <ul className="space-y-3">
+              {reminders.map((reminder, index) => (
+                <li
+                  key={reminder._id}
+                  className={`p-3 rounded-xl shadow-lg border
+                    ${index % 2 === 0 ? "bg-cyan-900/40" : "bg-green-900/40"}
+                  `}
+                >
+                  <p className="text-yellow-400 font-bold text-lg">
+                    {reminder.title}
+                  </p>
+                  <p className="text-cyan-300 text-sm">
+                    {reminder.date} {reminder.time}
+                  </p>
+                  <p className="text-green-400">{reminder.details}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
                     <button
                         onClick={() => {
                             setForm({  // รีเซ็ตฟอร์มเป็นค่าเริ่มต้น
