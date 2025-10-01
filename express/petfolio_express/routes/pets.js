@@ -13,25 +13,25 @@ router.get("/", async (req, res) => {
   }
 });
 
+//////////////////////////////////////////get pet count
+router.get("/petcount/:userId", async (req, res) => {
+  const { userId } = req.params;
 
-router.get("/petcount/:userId",async (req,res)=>{
-
-      const { userId } = req.params;
-    try{
-    // หา User ใน backend
-    const user = await User.findOne({ userId }); // หรือ _id: userId ถ้า frontend ส่ง _id
+  try {
+    const user = await User.findOne({ userId }); 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // query pets ของ user
-    const pets_count = await Pet.countDocuments(Pet.find({ owner: user._id }).populate("owner", "username email"));
+    const petsCountByType = await Pet.aggregate([
+      { $match: { owner: user._id } },
+      { $group: { _id: "$type", count: { $sum: 1 } } },
+      { $project: { _id: 0, type: "$_id", count: 1 } } 
+    ]);
 
-    res.json(pets_count); // ส่งกลับเป็น array
-    }
-    catch(err){
-        res.status(500).json({ error: err.message})
-    }
-
-})
+    res.json(petsCountByType);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 

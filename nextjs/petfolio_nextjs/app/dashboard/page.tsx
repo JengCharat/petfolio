@@ -23,7 +23,7 @@ export default function First_page() {
     const [pets, setPets] = useState([]);
     const [eventsData, setEventsData] = useState({});
     const [isLoading, setIsLoading] = useState(true); // เพิ่ม state สำหรับการโหลด
-    const [petCount,setPetCount] = useState(0)
+    const [petCount, setPetCount] = useState<{ [key: string]: number }>({});
     const [form, setForm] = useState({
         name: "",
         type: "" as string,
@@ -67,7 +67,7 @@ export default function First_page() {
 
           setShowModal(false);
           setForm({ name:"", type:"", breed:"", birthdate:"", weight:"", gender:"", personality:"", medicalConditions:"", privacy:"private" });
-
+            fetchPetCount()
         } catch (err) {
           console.error(err);
           alert("ไม่สามารถเพิ่มสัตว์เลี้ยงได้");
@@ -109,22 +109,28 @@ export default function First_page() {
 
 
 
-    useEffect(()=>{
-        const fetchPetCount = async () => {
-            try{
-                const res = await fetch('http://127.0.0.1:3002/api/pets/petcount/9PefA6P1uQMHjdCisXQZk')
-                if(!res.ok){
-                    throw new Error('Fail to fetch')
-                }
-                const result = await res.json()
-                setPetCount(result)
-        }catch(err){
-                alert(err)
-            }
-        }
-        fetchPetCount()
+          const fetchPetCount = async () => {
 
-    },[])
+                const userId = localStorage.getItem("userId");
+                            try {
+              const res = await fetch(`http://127.0.0.1:3002/api/pets/petcount/${userId}`);
+              if (!res.ok) throw new Error("Fail to fetch");
+
+              const result = await res.json();
+              const formatted = result.reduce((acc: any, item: any) => {
+                acc[item.type] = item.count;
+                return acc;
+              }, {});
+              setPetCount(formatted);
+            } catch (err: any) {
+              alert(err.message);
+            }
+          };
+
+        useEffect(() => {
+
+          fetchPetCount();
+        }, []);
 
 
 
@@ -140,7 +146,12 @@ export default function First_page() {
           {userEmail && (
             <p className="mb-2 text-green-600">Logged in as: {userEmail}</p>
           )}
-            <h1 className="text-red-200 text-3xl">this is pet count: {petCount}</h1>
+            <h1 className="text-red-200 text-3xl">Cat: {petCount.cat || 0}</h1>
+            <h1 className="text-red-200 text-3xl">Dog: {petCount.dog || 0}</h1>
+            <h1 className="text-red-200 text-3xl">bird: {petCount.bird || 0}</h1>
+            <h1 className="text-red-200 text-3xl">fish: {petCount.fish || 0}</h1>
+            <h1 className="text-red-200 text-3xl">rabbit: {petCount.rabbit || 0}</h1>
+            <h1 className="text-red-200 text-3xl">hamster: {petCount.hamster || 0}</h1>
 
                     <button
                         onClick={() => {
