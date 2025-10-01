@@ -13,6 +13,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+//////////////////////////////////////////get pet count
+router.get("/petcount/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findOne({ userId }); 
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const petsCountByType = await Pet.aggregate([
+      { $match: { owner: user._id } },
+      { $group: { _id: "$type", count: { $sum: 1 } } },
+      { $project: { _id: 0, type: "$_id", count: 1 } } 
+    ]);
+
+    res.json(petsCountByType);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 // GET /api/pets/user/:userId → ดึงสัตว์ของผู้ใช้คนเดียว
 router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
@@ -95,5 +117,8 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "Failed to delete pet" });
   }
 });
+
+
+
 
 module.exports = router;

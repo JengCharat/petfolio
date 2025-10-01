@@ -1,16 +1,76 @@
-
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [reminderCount, setReminderCount] = useState(0);
 
-  const toggleProfileMenu = () => {
-    setIsProfileOpen(!isProfileOpen);
+useEffect(() => {
+  const fetchReminderCount = async () => {
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    if (!userId || !token) return;
+
+    try {
+      const res = await fetch(`http://localhost:3002/api/reminders/user/${userId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch reminders");
+      const data = await res.json();
+
+      const incomplete = (data as { completed: boolean }[]).filter(r => !r.completed);
+      setReminderCount(incomplete.length);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  // เรียกครั้งแรก
+  fetchReminderCount();
+
+  // ตั้ง interval ให้ fetch ทุก 1 วินาที
+  const interval = setInterval(fetchReminderCount, 1000);
+
+  // ล้าง interval ตอน component unmount
+  return () => clearInterval(interval);
+}, []);
+  useEffect(() => {
+    const fetchReminderCount = async () => {
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+      if (!userId || !token) return;
+
+      try {
+        const res = await fetch(`http://localhost:3002/api/reminders/user/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch reminders");
+        const data = await res.json();
+
+        // cast เฉพาะ object ที่เราต้องการใช้ completed
+        const incomplete = (data as { completed: boolean }[]).filter(
+          (r) => !r.completed
+        );
+        setReminderCount(incomplete.length);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchReminderCount();
+  }, []);
+
+  const toggleProfileMenu = () => setIsProfileOpen(!isProfileOpen);
 
   return (
     <nav className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-purple-100">
@@ -27,40 +87,22 @@ export default function Navbar() {
 
           {/* เมนู */}
           <div className="flex items-center space-x-6">
-            <Link
-              href="/dashboard"
-              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-            >
+            <Link href="/dashboard" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               หน้าหลัก
             </Link>
-            <Link
-              href="/pet"
-              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-            >
+            <Link href="/pet" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               สัตว์เลี้ยง
             </Link>
-            <Link
-              href="/health"
-              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-            >
+            <Link href="/health" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               สุขภาพ
             </Link>
-            <Link
-              href="/calendar"
-              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-            >
+            <Link href="/calendar" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               ปฏิทิน
             </Link>
-            <Link
-              href="/community"
-              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-            >
+            <Link href="/community" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               คอมมูนิตี้
             </Link>
-            <Link
-              href="/explore"
-              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-            >
+            <Link href="/explore" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               สำรวจ
             </Link>
 
@@ -70,9 +112,11 @@ export default function Navbar() {
               className="relative text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
               แจ้งเตือน
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                5
-              </span>
+              {reminderCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                  {reminderCount}
+                </span>
+              )}
             </Link>
 
             {/* โปรไฟล์ */}
@@ -88,16 +132,10 @@ export default function Navbar() {
 
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
-                  >
+                  <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                     โปรไฟล์
                   </Link>
-                  <Link
-                    href="/settings"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
-                  >
+                  <Link href="/settings" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                     การตั้งค่า
                   </Link>
                   <hr className="my-2" />
