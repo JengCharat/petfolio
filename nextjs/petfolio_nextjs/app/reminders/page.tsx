@@ -24,6 +24,20 @@ interface ReminderType {
   details: string;
 }
 
+// --- Raw Reminder from API ---
+interface RawReminder {
+  _id: string;
+  petId?: { _id: string } | null;
+  title?: string;
+  date?: string;
+  time?: string;
+  frequency?: FrequencyType;
+  details?: string;
+  completed?: boolean;
+  petName?: string;
+  petType?: string;
+}
+
 // --- Component ---
 export default function Reminder() {
   const [pets, setPets] = useState<Pet[]>([]);
@@ -77,16 +91,24 @@ export default function Reminder() {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!remRes.ok) throw new Error("Failed to fetch reminders");
-        const remData = await remRes.json();
+        const remData: RawReminder[] = await remRes.json();
 
         const incomplete: ReminderType[] = [];
         const completed: ReminderType[] = [];
 
-        remData.forEach((r: any) => {
+        remData.forEach((r) => {
           let pet: Pet | undefined = r.petId
-            ? formattedPets.find(p => p._id === r.petId._id?.toString())
+            ? formattedPets.find(p => p._id === r.petId?._id)
             : undefined;
-          if (!pet) pet = { _id: "", name: r.petName || "ไม่ทราบ", type: "unknown", emoji: r.petType ? getPetEmoji(r.petType) : "🐾" };
+
+          if (!pet) {
+            pet = {
+              _id: "",
+              name: r.petName || "ไม่ทราบ",
+              type: "unknown",
+              emoji: r.petType ? getPetEmoji(r.petType) : "🐾"
+            };
+          }
 
           const reminderObj: ReminderType = {
             _id: r._id,
@@ -105,8 +127,8 @@ export default function Reminder() {
         setReminders(incomplete);
         setCompletedReminders(completed);
 
-      } catch (err) {
-        console.error(err);
+      } catch (error: unknown) {
+        console.error(error);
         setPets([]);
         setReminders([]);
         setCompletedReminders([]);
@@ -164,13 +186,13 @@ export default function Reminder() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        const errData: { error?: string } = await response.json();
         throw new Error(errData.error || "Failed to save reminder");
       }
 
-      const savedReminder = await response.json();
+      const savedReminder: RawReminder = await response.json();
       setReminders(prev => [
-        ...prev, 
+        ...prev,
         {
           _id: savedReminder._id,
           petId: petObj,
@@ -190,9 +212,12 @@ export default function Reminder() {
       setNotePlaceholder("รายละเอียดเพิ่มเติม...");
       setIsReminderModalOpen(false);
 
-    } catch (error: any) {
-      console.error(error);
-      alert(`เกิดข้อผิดพลาดในการบันทึกกิจกรรม: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(`เกิดข้อผิดพลาดในการบันทึกกิจกรรม: ${error.message}`);
+      } else {
+        alert(`เกิดข้อผิดพลาดไม่ทราบชนิด`);
+      }
     }
   };
 
@@ -212,12 +237,11 @@ export default function Reminder() {
 
       if (!res.ok) throw new Error("ไม่สามารถทำเครื่องหมายเสร็จแล้วได้");
 
-      // รับ object จริงจาก server
-      const completedReminder = await res.json();
+      const completedReminder: RawReminder = await res.json();
 
       let pet: Pet | null = null;
       if (completedReminder.petId) {
-        pet = pets.find(p => p._id === completedReminder.petId._id) || {
+        pet = pets.find(p => p._id === completedReminder.petId?._id) || {
           _id: "",
           name: completedReminder.petName || "ไม่ทราบ",
           type: "unknown",
@@ -235,15 +259,15 @@ export default function Reminder() {
         details: completedReminder.details || ""
       };
 
-      // เพิ่มลง completedReminders
       setCompletedReminders(prev => [...prev, reminderObj]);
-
-      // ลบออกจาก reminders
       setReminders(prev => prev.filter(r => r._id !== id));
 
-    } catch (error: any) {
-      console.error(error);
-      alert(`เกิดข้อผิดพลาด: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(`เกิดข้อผิดพลาด: ${error.message}`);
+      } else {
+        alert(`เกิดข้อผิดพลาดไม่ทราบชนิด`);
+      }
     }
   };
 
@@ -360,8 +384,8 @@ export default function Reminder() {
 
                 {/* Datetime */}
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">วันที่และเวลา *</label>
-                  <input type="datetime-local" name="datetime" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} required/>
+                  <label className="block text-gray-700 font-medium mb-2">วันและเวลา *</label>
+                  <input type="datetime-local" name="datetime" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} required />
                 </div>
 
                 {/* Frequency */}
@@ -378,18 +402,18 @@ export default function Reminder() {
                 {/* Note */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">หมายเหตุ</label>
-                  <textarea name="note" placeholder={notePlaceholder} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" rows={3}></textarea>
+                  <textarea name="note" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" placeholder={notePlaceholder}></textarea>
                 </div>
 
-                {/* Buttons */}
-                <div className="flex justify-end space-x-4 mt-4">
-                  <button type="button" onClick={() => setIsReminderModalOpen(false)} className="px-6 py-3 border rounded-xl text-gray-700 hover:bg-gray-100">ยกเลิก</button>
+                <div className="flex justify-end space-x-4">
+                  <button type="button" onClick={() => setIsReminderModalOpen(false)} className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-100">ยกเลิก</button>
                   <button type="submit" className="px-6 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700">บันทึก</button>
                 </div>
               </form>
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
