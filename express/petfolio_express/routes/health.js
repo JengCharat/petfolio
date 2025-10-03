@@ -1,11 +1,14 @@
+// routes/health.js
 const express = require("express");
 const router = express.Router();
-const { HealthRecord } = require("../models/HealthRecord"); // ✅ ใช้ model จริง
+const HealthRecord = require("../models/HealthRecord");
 
-// 📥 GET: ดึงทั้งหมด
+// 📌 GET: ดึง Health Records ทั้งหมด
 router.get("/", async (req, res) => {
   try {
-    const records = await HealthRecord.find({ userId: req.user.id }).sort({ date: -1 });
+    const records = await HealthRecord.find()
+      .populate("pet") // ดึงข้อมูลสัตว์เลี้ยงมาด้วย
+      .sort({ date: -1 });
     res.json(records);
   } catch (err) {
     console.error("❌ GET /api/health error:", err);
@@ -13,10 +16,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ➕ POST: เพิ่ม
+// ➕ POST: เพิ่มบันทึกใหม่
 router.post("/", async (req, res) => {
   try {
-    const newRecord = await HealthRecord.create({ ...req.body, userId: req.user.id });
+    const newRecord = await HealthRecord.create(req.body);
     res.status(201).json(newRecord);
   } catch (err) {
     console.error("❌ POST /api/health error:", err);
@@ -24,10 +27,11 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✏️ PUT: แก้ไข
+// ✏️ PUT: แก้ไขบันทึก
 router.put("/:id", async (req, res) => {
   try {
     const updated = await HealthRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ error: "Record not found" });
     res.json(updated);
   } catch (err) {
     console.error("❌ PUT /api/health/:id error:", err);
@@ -35,10 +39,11 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// ❌ DELETE: ลบ
+// ❌ DELETE: ลบบันทึก
 router.delete("/:id", async (req, res) => {
   try {
-    await HealthRecord.findByIdAndDelete(req.params.id);
+    const deleted = await HealthRecord.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Record not found" });
     res.json({ message: `Deleted record ${req.params.id}` });
   } catch (err) {
     console.error("❌ DELETE /api/health/:id error:", err);

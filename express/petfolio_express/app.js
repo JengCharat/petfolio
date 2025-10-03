@@ -13,7 +13,6 @@ const usersRouter = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const petRoutes = require("./routes/pets");
 const healthRoutes = require("./routes/health");
-const authMw = require("./middlewares/nextauth-mw");
 
 const app = express();
 
@@ -43,7 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
-app.use("/api/health", authMw, healthRoutes);
+app.use("/api/health", healthRoutes);
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
