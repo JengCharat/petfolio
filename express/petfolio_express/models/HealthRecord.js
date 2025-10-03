@@ -7,6 +7,9 @@ const healthRecordSchema = new mongoose.Schema({
   clinic: { type: String },
   detail: { type: String },
   cost: { type: Number, default: 0 },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  ownerUserId: { type: String, required: true }, // <-- เพิ่มตรงนี้
 });
+
 
 module.exports = mongoose.model("HealthRecord", healthRecordSchema);
