@@ -44,14 +44,15 @@ export default function PetApp() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRecord, setNewRecord] = useState<Partial<HealthRecord>>({});
 
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editRecord, setEditRecord] = useState<Partial<HealthRecord>>({});
+
   // โหลด token และ userId จาก localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
     setToken(storedToken);
-    if (storedUserId) {
-      setCurrentUser({ _id: storedUserId });
-    }
+    if (storedUserId) setCurrentUser({ _id: storedUserId });
   }, []);
 
   // โหลด pets
@@ -126,7 +127,35 @@ export default function PetApp() {
     }
   };
 
-  // โหลดข้อมูลเมื่อ user พร้อม
+  // บันทึก record ที่แก้ไข
+  const saveEditRecord = async () => {
+    if (!token || !editRecord._id) return;
+    try {
+      const payload = {
+        type: editRecord.type,
+        date: editRecord.date,
+        clinic: editRecord.clinic,
+        detail: editRecord.detail,
+        cost: editRecord.cost,
+      };
+
+      await fetch(`${BASE_URL}/health/${editRecord._id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      setShowEditModal(false);
+      setEditRecord({});
+      loadHealthRecords();
+    } catch (err) {
+      console.error("update error:", err);
+    }
+  };
+
   useEffect(() => {
     if (token && currentUser) {
       loadPets();
@@ -142,7 +171,6 @@ export default function PetApp() {
           สัตว์เลี้ยงของฉัน
         </h2>
 
-        {/* เลือกสัตว์เลี้ยง */}
         <select
           onChange={(e) => {
             const pet = pets.find((p) => p._id === e.target.value) || null;
@@ -159,19 +187,14 @@ export default function PetApp() {
           ))}
         </select>
 
-        {/* Modal รายละเอียดสัตว์เลี้ยง */}
         {showDetailModal && selectedPet && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-white p-6 rounded-xl max-w-md w-full">
               <h3 className="text-xl font-bold mb-4">
                 {selectedPet.name} {typeEmoji[selectedPet.type ?? ""] ?? ""}
               </h3>
-              <p>
-                <strong>ประเภท:</strong> {selectedPet.type || "-"}
-              </p>
-              <p>
-                <strong>สายพันธุ์:</strong> {selectedPet.breed || "-"}
-              </p>
+              <p><strong>ประเภท:</strong> {selectedPet.type || "-"}</p>
+              <p><strong>สายพันธุ์:</strong> {selectedPet.breed || "-"}</p>
               <div className="mt-4 text-right">
                 <button
                   onClick={() => setShowDetailModal(false)}
@@ -184,24 +207,17 @@ export default function PetApp() {
           </div>
         )}
 
-        {/* รายการสัตว์เลี้ยง */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
           {pets.map((p) => (
-            <div
-              key={p._id}
-              className="p-4 bg-white rounded-lg shadow hover:shadow-md"
-            >
+            <div key={p._id} className="p-4 bg-white rounded-lg shadow hover:shadow-md">
               <h3 className="text-lg font-semibold">
                 {p.name} {typeEmoji[p.type ?? ""] ?? ""}
               </h3>
-              <p>
-                {p.type} {p.breed ? `(${p.breed})` : ""}
-              </p>
+              <p>{p.type} {p.breed ? `(${p.breed})` : ""}</p>
             </div>
           ))}
         </div>
 
-        {/* ประวัติสุขภาพ */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">
             ประวัติสุขภาพสัตว์เลี้ยง
@@ -219,14 +235,10 @@ export default function PetApp() {
         ) : (
           <ul className="space-y-4">
             {records.map((rec) => (
-              <li
-                key={rec._id}
-                className="p-4 bg-white rounded-lg shadow hover:shadow-md"
-              >
+              <li key={rec._id} className="p-4 bg-white rounded-lg shadow hover:shadow-md">
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold">
-                    {rec.pet?.name} {typeEmoji[rec.pet?.type ?? ""] ?? ""} -{" "}
-                    {rec.type}
+                    {rec.pet?.name} {typeEmoji[rec.pet?.type ?? ""] ?? ""} - {rec.type}
                   </h3>
                   <div className="space-x-2">
                     <button
@@ -239,6 +251,15 @@ export default function PetApp() {
                       ดู
                     </button>
                     <button
+                      onClick={() => {
+                        setEditRecord(rec);
+                        setShowEditModal(true);
+                      }}
+                      className="px-3 py-1 bg-yellow-500 text-white rounded"
+                    >
+                      ✏️ แก้ไข
+                    </button>
+                    <button
                       onClick={() => deleteRecord(rec._id)}
                       className="px-3 py-1 bg-red-600 text-white rounded"
                     >
@@ -246,15 +267,9 @@ export default function PetApp() {
                     </button>
                   </div>
                 </div>
-                <p>
-                  <strong>วันที่:</strong> {rec.date}
-                </p>
-                <p>
-                  <strong>สถานที่:</strong> {rec.clinic || "-"}
-                </p>
-                <p>
-                  <strong>ค่าใช้จ่าย:</strong> {rec.cost} บาท
-                </p>
+                <p><strong>วันที่:</strong> {rec.date}</p>
+                <p><strong>สถานที่:</strong> {rec.clinic || "-"}</p>
+                <p><strong>ค่าใช้จ่าย:</strong> {rec.cost} บาท</p>
               </li>
             ))}
           </ul>
@@ -289,7 +304,6 @@ export default function PetApp() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-6 rounded-xl max-w-md w-full">
             <h3 className="text-xl font-bold mb-4">เพิ่มประวัติสุขภาพ</h3>
-
             <select
               className="w-full border px-3 py-2 mb-3"
               onChange={(e) =>
@@ -333,9 +347,7 @@ export default function PetApp() {
               type="number"
               placeholder="ค่าใช้จ่าย"
               className="w-full border px-3 py-2 mb-3"
-              onChange={(e) =>
-                setNewRecord({ ...newRecord, cost: Number(e.target.value) })
-              }
+              onChange={(e) => setNewRecord({ ...newRecord, cost: Number(e.target.value) })}
             />
 
             <div className="flex justify-between">
@@ -350,6 +362,64 @@ export default function PetApp() {
                 className="px-4 py-2 bg-blue-600 text-white rounded"
               >
                 บันทึก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal ฟอร์มแก้ไข record */}
+      {showEditModal && editRecord && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white p-6 rounded-xl max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4">แก้ไขประวัติสุขภาพ</h3>
+
+            <input
+              type="text"
+              placeholder="ประเภท (vaccine, checkup ...)"
+              className="w-full border px-3 py-2 mb-3"
+              value={editRecord.type || ""}
+              onChange={(e) => setEditRecord({ ...editRecord, type: e.target.value })}
+            />
+            <input
+              type="date"
+              className="w-full border px-3 py-2 mb-3"
+              value={editRecord.date || ""}
+              onChange={(e) => setEditRecord({ ...editRecord, date: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="คลินิก"
+              className="w-full border px-3 py-2 mb-3"
+              value={editRecord.clinic || ""}
+              onChange={(e) => setEditRecord({ ...editRecord, clinic: e.target.value })}
+            />
+            <textarea
+              placeholder="รายละเอียด"
+              className="w-full border px-3 py-2 mb-3"
+              value={editRecord.detail || ""}
+              onChange={(e) => setEditRecord({ ...editRecord, detail: e.target.value })}
+            />
+            <input
+              type="number"
+              placeholder="ค่าใช้จ่าย"
+              className="w-full border px-3 py-2 mb-3"
+              value={editRecord.cost || 0}
+              onChange={(e) => setEditRecord({ ...editRecord, cost: Number(e.target.value) })}
+            />
+
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 bg-gray-400 text-white rounded"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={saveEditRecord}
+                className="px-4 py-2 bg-yellow-500 text-white rounded"
+              >
+                บันทึกการแก้ไข
               </button>
             </div>
           </div>
