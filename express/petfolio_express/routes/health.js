@@ -22,13 +22,30 @@ router.get("/", async (req, res) => {
 // ➕ POST: เพิ่ม health record
 router.post("/", async (req, res) => {
   try {
-    const newRecord = await HealthRecord.create(req.body);
+    const { pet, type, date, clinic, detail, cost, ownerUserId } = req.body;
+
+    // หา user object ก่อนจาก ownerUserId
+    const user = await User.findOne({ userId: ownerUserId });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const newRecord = await HealthRecord.create({
+      pet,
+      type,
+      date,
+      clinic,
+      detail,
+      cost,
+      owner: user._id,
+      ownerUserId,
+    });
+
     res.status(201).json(newRecord);
   } catch (err) {
     console.error("❌ POST /api/health error:", err);
     res.status(500).json({ error: "Failed to create record" });
   }
 });
+
 
 // ✏️ PUT: แก้ไข health record
 router.put("/:id", async (req, res) => {

@@ -9,7 +9,7 @@ const healthRecordSchema = new mongoose.Schema(
     detail: { type: String },
     cost: { type: Number, default: 0 },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    ownerUserId: { type: String, required: true }, // สำหรับ query ด้วย string userId
+    ownerUserId: { type: String, required: true }, // string id สำหรับ query
   },
   { timestamps: true }
 );
