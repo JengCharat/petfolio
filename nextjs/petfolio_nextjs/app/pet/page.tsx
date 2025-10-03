@@ -499,21 +499,34 @@ export default function PetApp() {
                 {/* Detail Modal */}
                 {showDetailModal && selectedPet && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8">
-                            <h3 className="text-2xl font-bold mb-4">{selectedPet.name} {selectedPet.emoji}</h3>
-                            <p><strong>ประเภท:</strong> {selectedPet.type}</p>
-                            <p><strong>สายพันธุ์:</strong> {selectedPet.breed || "-"}</p>
-                            <p><strong>วันเกิด:</strong> {selectedPet.birthdate || "-"}</p>
-                            <p><strong>น้ำหนัก:</strong> {selectedPet.weight ?? "-"} กก.</p>
-                            <p><strong>เพศ:</strong> {selectedPet.gender || "-"}</p>
-                            <p><strong>นิสัย/บุคลิกภาพ:</strong> {selectedPet.personality || "-"}</p>
-                            <p><strong>โรคประจำตัว/อาการแพ้:</strong> {selectedPet.medicalConditions || "-"}</p>
-                            <p><strong>สถานะ:</strong> {selectedPet.privacy === "private" ? "🔒 ส่วนตัว" : "🌍 สาธารณะ"}</p>
+                        <div className="bg-white rounded-2xl shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-8">
+                            {/* Header */}
+                            <div className="mb-6 text-center">
+                                <h3 className="text-4xl font-bold text-gray-800 text-center">
+                                    {selectedPet.name} {selectedPet.emoji}
+                                </h3>
+                            </div>
 
-                            <div className="flex justify-end mt-4">
+                            {/* Details */}
+                            <div className="space-y-3 text-gray-700">
+                                <p><strong className="font-medium">ประเภท:</strong> {selectedPet.type}</p>
+                                <p><strong className="font-medium">สายพันธุ์:</strong> {selectedPet.breed || "-"}</p>
+                                <p><strong className="font-medium">วันเกิด:</strong> {selectedPet.birthdate || "-"}</p>
+                                <p><strong className="font-medium">น้ำหนัก:</strong> {selectedPet.weight ?? "-"} กก.</p>
+                                <p><strong className="font-medium">เพศ:</strong> {selectedPet.gender || "-"}</p>
+                                <p><strong className="font-medium">นิสัย/บุคลิกภาพ:</strong> {selectedPet.personality || "-"}</p>
+                                <p><strong className="font-medium">โรคประจำตัว/อาการแพ้:</strong> {selectedPet.medicalConditions || "-"}</p>
+                                <p>
+                                    <strong className="font-medium">สถานะ:</strong>{" "}
+                                    {selectedPet.privacy === "private" ? "🔒 ส่วนตัว" : "🌍 สาธารณะ"}
+                                </p>
+                            </div>
+
+                            {/* Close Button */}
+                            <div className="flex justify-end mt-6">
                                 <button
                                     onClick={() => setShowDetailModal(false)}
-                                    className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                                    className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors"
                                 >
                                     ปิด
                                 </button>
@@ -521,6 +534,7 @@ export default function PetApp() {
                         </div>
                     </div>
                 )}
+
 
                 {showEditModal && editingPet && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

@@ -1,10 +1,12 @@
 "use client"
 import { useState } from "react";
 import Navbar from "../components/Navbar"
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+   const router = useRouter();
 
   const handleLogin = async () => {
     const res = await fetch("http://localhost:3002/api/auth/login", {
@@ -18,6 +20,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId); // ✅ ใช้ userId
       alert("Login success");
+      router.push("/dashboard");
     } else {
       alert(data.error || "Login failed");
     }

@@ -102,10 +102,7 @@ useEffect(() => {
             <Link href="/community" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
               คอมมูนิตี้
             </Link>
-            <Link href="/explore" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
-              สำรวจ
-            </Link>
-
+            
             {/* แจ้งเตือน */}
             <Link
               href="/reminders"

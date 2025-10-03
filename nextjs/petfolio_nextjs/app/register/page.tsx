@@ -1,11 +1,14 @@
 "use client"
 import { useState } from "react";
+import router, { Router } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
   const [username, setUsername] = useState(""); // เพิ่ม username
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
@@ -22,12 +25,13 @@ export default function Register() {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Register successful! Your userId: " + data.userId);
+        alert("Register successful!" );
         localStorage.setItem("userId", data.userId); // เก็บ userId ไว้ frontend
         setUsername("");
         setEmail("");
         setPassword("");
         setConfirmPassword("");
+         router.push("/login");
       } else {
         alert(data.error || "Register failed");
       }
@@ -36,6 +40,10 @@ export default function Register() {
       alert("Something went wrong");
     }
   };
+
+    const GotoLogin = () => {
+    router.push('login')
+  }
 
 
   return (
@@ -100,7 +108,7 @@ export default function Register() {
           <button
             className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white 
                    rounded-xl font-medium transition-colors shadow-lg"
-            onClick={handleRegister}
+           onClick={handleRegister}
           >
             สมัครสมาชิก
           </button>

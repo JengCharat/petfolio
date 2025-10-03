@@ -220,9 +220,7 @@ export default function Calendar() {
                             <button onClick={showReminderModal} className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg">
                                 ➕ เพิ่มการแจ้งเตือน
                             </button>
-                            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg">
-                                📅 ซิงค์ Google Calendar
-                            </button>
+                           
                         </div>
                     </div>
                     <div className="bg-white rounded-2xl shadow-lg p-6">
