@@ -1,16 +1,17 @@
-// routes/health.js
 const express = require("express");
 const router = express.Router();
 const HealthRecord = require("../models/HealthRecord");
 const Pet = require("../models/pet");
-const User = require("../models/User"); // เพิ่ม import
+const User = require("../models/User");
 
-// 📌 GET: ดึงทั้งหมด
+// 📌 GET: ดึง health records ทั้งหมด
 router.get("/", async (req, res) => {
   try {
     const records = await HealthRecord.find()
       .populate("pet")
+      .populate("owner", "username email")
       .sort({ date: -1 });
+
     res.json(records);
   } catch (err) {
     console.error("❌ GET /api/health error:", err);
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ➕ POST: เพิ่ม
+// ➕ POST: เพิ่ม health record
 router.post("/", async (req, res) => {
   try {
     const newRecord = await HealthRecord.create(req.body);
@@ -29,7 +30,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✏️ PUT: แก้ไข
+// ✏️ PUT: แก้ไข health record
 router.put("/:id", async (req, res) => {
   try {
     const updated = await HealthRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -41,7 +42,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// ❌ DELETE: ลบ
+// ❌ DELETE: ลบ health record
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await HealthRecord.findByIdAndDelete(req.params.id);
@@ -58,18 +59,12 @@ router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
 
   try {
-    console.log("Fetching records for userId:", userId);
-
-    // หา user โดยใช้ field userId (string) แทน _id
-    const user = await User.findOne({ userId: userId });
-    if (!user) {
-      console.error("User not found for userId:", userId);
-      return res.status(404).json({ error: `User with ID ${userId} not found` });
-    }
+    console.log("Fetching health records for userId:", userId);
 
     // 🔹 ดึง health records ของ user โดยตรงจาก ownerUserId
     const records = await HealthRecord.find({ ownerUserId: userId })
       .populate("pet", "name type")
+      .populate("owner", "username email") // optional: ดูชื่อ user ด้วย
       .sort({ date: -1 });
 
     if (!records || records.length === 0) {
@@ -89,8 +84,5 @@ router.get("/user/:userId", async (req, res) => {
     });
   }
 });
-
-
-
 
 module.exports = router;
