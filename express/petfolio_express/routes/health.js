@@ -3,11 +3,11 @@ const express = require("express");
 const router = express.Router();
 const HealthRecord = require("../models/HealthRecord");
 
-// 📌 GET: ดึง Health Records ทั้งหมด
+// 📌 GET: ดึงทั้งหมด
 router.get("/", async (req, res) => {
   try {
     const records = await HealthRecord.find()
-      .populate("pet") // ดึงข้อมูลสัตว์เลี้ยงมาด้วย
+      .populate("pet")
       .sort({ date: -1 });
     res.json(records);
   } catch (err) {
@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ➕ POST: เพิ่มบันทึกใหม่
+// ➕ POST: เพิ่ม
 router.post("/", async (req, res) => {
   try {
     const newRecord = await HealthRecord.create(req.body);
@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✏️ PUT: แก้ไขบันทึก
+// ✏️ PUT: แก้ไข
 router.put("/:id", async (req, res) => {
   try {
     const updated = await HealthRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -39,7 +39,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// ❌ DELETE: ลบบันทึก
+// ❌ DELETE: ลบ
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await HealthRecord.findByIdAndDelete(req.params.id);
