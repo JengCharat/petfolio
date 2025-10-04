@@ -218,10 +218,10 @@ export default function PetApp() {
                             <h3 className="text-lg font-semibold">
                                 {p.name} {typeEmoji[p.type ?? ""] ?? ""}
                             </h3>
-                            <p className="mb-2">{p.type} {p.breed ? `(สายพันธ์ุ: ${p.breed})` : ""}</p>
-                            {p.medicalConditions && (
-                                <p className="text-red-500">⚠️ ข้อมูลสำคัญทางการแพทย์: {p.medicalConditions}</p>
-                            )}
+                            <p className="mb-2">{p.type} {p.breed ? `(สายพันธ์ุ : ${p.breed})` : ""}</p>
+                            <p className="text-red-500"> <strong>⚠️ ข้อมูลสำคัญทางการแพทย์</strong>  </p>
+                            <p className="text-red-500">: {p.medicalConditions}</p>
+                            
                         </div>
                     ))}
                 </div>
