@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [reminderCount, setReminderCount] = useState(0);
+  const router = useRouter();
 
 useEffect(() => {
   const fetchReminderCount = async () => {
@@ -72,6 +74,13 @@ useEffect(() => {
 
   const toggleProfileMenu = () => setIsProfileOpen(!isProfileOpen);
 
+  // ฟังก์ชัน logout
+  const logout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    router.push("/login"); // เปลี่ยน path เป็นหน้า login ของคุณ
+  };
+
   return (
     <nav className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-purple-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,7 +145,9 @@ useEffect(() => {
                     การตั้งค่า
                   </Link>
                   <hr className="my-2" />
-                  <button className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                  <button 
+                  onClick={logout}
+                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
                     ออกจากระบบ
                   </button>
                 </div>
