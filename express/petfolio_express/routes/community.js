@@ -115,7 +115,8 @@ router.get("/user/:userId", async (req, res) => {
     const ownerId = user._id;
 
     // 3. หาโพสต์โดย owner แล้วเรียงจากใหม่ → เก่า
-    const posts = await CommunityPost.find({ owner: ownerId }).sort({ createdAt: -1 });
+    const posts = await CommunityPost.find({ owner: ownerId })
+    .populate("pets", "name").sort({ createdAt: -1 });
 
     res.json(posts);
   } catch (error) {
@@ -123,6 +124,116 @@ router.get("/user/:userId", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
+// GET post
+router.get('/communityposts/:id', async (req, res) => {
+  try {
+    const post = await CommunityPost.findById(req.params.id)
+      .populate('pets')        // ดึงข้อมูลสัตว์เลี้ยง
+      .populate('owner', 'username email'); // ดึงข้อมูลเจ้าของโพสต์ เฉพาะ username และ email
+
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    // ส่งข้อมูลทั้งหมดของโพสต์
+    res.json({
+      _id: post._id,
+      PostDesc: post.PostDesc,
+      images: post.images,        // array ของ path รูป
+      pets: post.pets,            // populated pet objects
+      owner: post.owner,          // populated owner object
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      likes: post.likes || [],    // ถ้ามีระบบไลก์
+      comments: post.comments || [] // ถ้ามีระบบคอมเมนต์
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch post' });
+  }
+});
+
+
+// 📌 อัปเดตโพสต์
+router.post("/updatePost/:id", (req, res) => {
+  upload.array("images", 4)(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_COUNT") {
+        return res.status(400).json({
+          error: "คุณสามารถอัปโหลดได้สูงสุด 4 รูปเท่านั้น",
+        });
+      }
+      return res.status(500).json({ error: err.message });
+    }
+
+    try {
+      const { PostDesc, pets } = req.body;
+
+      // ดึงโพสต์เดิม
+      const post = await CommunityPost.findById(req.params.id);
+      if (!post) return res.status(404).json({ error: "Post not found" });
+
+      // อัปเดตข้อความ
+      if (PostDesc) post.PostDesc = PostDesc;
+
+      // อัปเดต pets
+      if (pets) {
+        const petIds = Array.isArray(pets) ? pets : [pets];
+        const validPets = await Pet.find({ _id: { $in: petIds } });
+        post.pets = validPets.map(p => p._id);
+      }
+
+      // อัปเดตรูป ถ้ามีการอัปโหลดใหม่หรือส่งรูปเดิมมาด้วย
+      let updatedImages = [];
+
+      // 1️⃣ ถ้ามีรูปเดิมที่ยังไม่ลบ
+      if (req.body.existingImages) {
+        updatedImages = Array.isArray(req.body.existingImages)
+          ? req.body.existingImages
+          : [req.body.existingImages];
+      }
+
+      // 2️⃣ ถ้ามีรูปใหม่
+      if (req.files && req.files.length > 0) {
+        const newImages = req.files.map(file => `/uploads/Post/${file.filename}`);
+        updatedImages = [...updatedImages, ...newImages];
+      }
+
+      // 3️⃣ อัปเดต post.images
+      post.images = updatedImages;
+
+
+      await post.save();
+
+      // populate pets และ owner
+      const populatedPost = await CommunityPost.findById(post._id)
+        .populate("pets")
+        .populate({ path: "owner", select: "username userId" });
+
+      // ส่งข้อมูลโพสต์ทั้งหมดกลับ
+      res.json({
+        _id: populatedPost._id,
+        PostDesc: populatedPost.PostDesc,
+        images: populatedPost.images,
+        pets: populatedPost.pets,
+        owner: populatedPost.owner,
+        createdAt: populatedPost.createdAt,
+        updatedAt: populatedPost.updatedAt,
+        likes: populatedPost.likes || [],
+        comments: populatedPost.comments || []
+      });
+
+    } catch (err) {
+      console.error("❌ Error updating post:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+});
+
+
+
+
+
 
 // DELETE post by id
 router.delete("/:id", async (req, res) => {
