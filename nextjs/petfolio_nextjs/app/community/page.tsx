@@ -244,7 +244,7 @@ const handleEdit = (postId: string) => {
                         ) : (
                           <p className="text-gray-500 text-sm mt-1">คุณยังไม่มีสัตว์เลี้ยง</p>
                         )}
-                        
+
                       </div>
 
 
@@ -407,7 +407,7 @@ const handleEdit = (postId: string) => {
                               <img
                                 src={`http://localhost:3002${post.images[0]}`}
                                 alt="post"
-                                className="w-full max-h-[400px] object-cover rounded-xl cursor-pointer"
+                                className="w-full h-32 object-cover rounded-xl cursor-pointer"
                                 onClick={() => setOpenImage(`http://localhost:3002${post.images[0]}`)}
                               />
                             )}
