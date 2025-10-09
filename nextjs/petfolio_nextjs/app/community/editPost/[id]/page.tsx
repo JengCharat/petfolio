@@ -11,7 +11,8 @@ export default function EditPostPage() {
 
   const [token, setToken] = useState<string | null>(null);
   const [postDesc, setPostDesc] = useState("");
-  const [images, setImages] = useState<(File | string)[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]); // รูปเดิมจาก server
+  const [newImages, setNewImages] = useState<File[]>([]); // รูปใหม่ที่เลือก
   const [selectedPets, setSelectedPets] = useState<string[]>([]);
   const [pets, setPets] = useState<{ _id: string; name: string }[]>([]);
 
@@ -34,7 +35,8 @@ export default function EditPostPage() {
         if (!data) return;
         setPostDesc(data.PostDesc || "");
         setSelectedPets(data.pets?.map((p: any) => p._id) || []);
-        setImages(data.images || []);
+        setExistingImages(data.images || []);
+        setNewImages([]);
       })
       .catch(err => console.error("Error fetching post:", err));
 
@@ -59,35 +61,24 @@ export default function EditPostPage() {
     e.preventDefault();
     if (!token || !postId) return;
 
-    // ✅ 1. ตรวจสอบว่ามีการเลือกสัตว์เลี้ยงอย่างน้อย 1 ตัว
     if (selectedPets.length === 0) {
       alert("กรุณาเลือกสัตว์เลี้ยงอย่างน้อย 1 ตัว");
       return;
     }
 
-    // ✅ 2. ตรวจสอบว่ามีการพิมพ์คำอธิบายหรืออัปโหลดรูปภาพอย่างน้อย 1 อย่าง
     const hasText = postDesc.trim().length > 0;
-    const hasImages = images.length > 0;
+    const hasImages = existingImages.length + newImages.length > 0;
     if (!hasText && !hasImages) {
       alert("กรุณากรอกคำอธิบายหรือเพิ่มรูปภาพอย่างน้อย 1 อย่าง");
       return;
     }
 
-    // ✅ 3. เตรียมข้อมูลส่งไป backend
     const formData = new FormData();
     formData.append("PostDesc", postDesc);
     selectedPets.forEach(petId => formData.append("pets", petId));
 
-    // ✅ 4. แยกภาพเดิมและภาพใหม่
-    images.forEach(img => {
-      if (img instanceof File) {
-        // รูปใหม่
-        formData.append("images", img);
-      } else {
-        // รูปเดิม
-        formData.append("existingImages", img);
-      }
-    });
+    existingImages.forEach(img => formData.append("existingImages", img));
+    newImages.forEach(img => formData.append("images", img));
 
     try {
       const res = await fetch(
@@ -113,118 +104,131 @@ export default function EditPostPage() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setNewImages(prev => [...prev, ...Array.from(e.target.files)]);
+  };
+
+  const handleRemoveImage = (idx: number, type: "existing" | "new") => {
+    if (type === "existing") {
+      setExistingImages(prev => prev.filter((_, i) => i !== idx));
+    } else {
+      setNewImages(prev => prev.filter((_, i) => i !== idx));
+    }
+  };
 
   return (
-   <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-  <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-black">
-    <h1 className="text-2xl font-bold mb-6 text-center">แก้ไขโพสต์</h1>
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <textarea
-        value={postDesc}
-        onChange={e => setPostDesc(e.target.value)}
-        placeholder="เขียนคำบรรยายภาพ..."
-        className="w-full border border-gray-300 rounded-xl p-3 text-black text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
-        rows={4}
-      />
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-black">
+        <h1 className="text-2xl font-bold mb-6 text-center">แก้ไขโพสต์</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <textarea
+            value={postDesc}
+            onChange={e => setPostDesc(e.target.value)}
+            placeholder="เขียนคำบรรยายภาพ..."
+            className="w-full border border-gray-300 rounded-xl p-3 text-black text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            rows={4}
+          />
 
-      {/* อัปโหลดรูป */}
-      <label className="cursor-pointer text-blue-600 hover:text-blue-700">
-        ✚ อัปโหลดรูปภาพ
-        <input
-          type="file"
-          multiple
-          ref={fileInputRef}
-          onChange={e =>
-            e.target.files &&
-            setImages([
-              ...images.filter(img => typeof img === "string"), // เก็บรูปเดิม
-              ...Array.from(e.target.files), // เพิ่มรูปใหม่
-            ])
-          }
-          className="hidden"
-        />
-      </label>
+          {/* อัปโหลดรูป */}
+          <label className="cursor-pointer text-blue-600 hover:text-blue-700">
+            ✚ อัปโหลดรูปภาพ
+            <input
+              type="file"
+              multiple
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
 
-      {/* แสดง preview */}
-      {images.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 mt-1">
-          {images.map((img, idx) => {
-            const url =
-              typeof img === "string"
-                ? `http://localhost:3002${img}`
-                : URL.createObjectURL(img);
-            return (
-              <div
-                key={idx}
-                className="relative w-full pb-[100%] rounded-md overflow-hidden border border-gray-200 shadow-sm"
-              >
-                <img
-                  src={url}
-                  alt={`preview-${idx}`}
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setImages(prev => prev.filter((_, i) => i !== idx))
-                  }
-                  className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+          {/* แสดง preview */}
+          {(existingImages.length + newImages.length) > 0 && (
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              {existingImages.map((img, idx) => {
+                const url = `http://localhost:3002${img}`;
+                return (
+                  <div
+                    key={`existing-${idx}`}
+                    className="relative w-full pb-[100%] rounded-md overflow-hidden border border-gray-200 shadow-sm"
+                  >
+                    <img src={url} className="absolute top-0 left-0 w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(idx, "existing")}
+                      className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+              {newImages.map((img, idx) => {
+                const url = URL.createObjectURL(img);
+                return (
+                  <div
+                    key={`new-${idx}`}
+                    className="relative w-full pb-[100%] rounded-md overflow-hidden border border-gray-200 shadow-sm"
+                  >
+                    <img src={url} className="absolute top-0 left-0 w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(idx, "new")}
+                      className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* เลือกสัตว์เลี้ยง */}
+          <div>
+            <label className="font-semibold">เลือกสัตว์เลี้ยง:</label>
+            <div className="grid grid-cols-2 gap-2 mt-1 max-h-24 overflow-y-auto">
+              {pets.map(pet => (
+                <label
+                  key={pet._id}
+                  className={`px-3 py-1 rounded-full border text-xs text-center cursor-pointer ${
+                    selectedPets.includes(pet._id)
+                      ? "bg-purple-600 text-white border-purple-600"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                  }`}
                 >
-                  ×
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+                  <input
+                    type="checkbox"
+                    value={pet._id}
+                    checked={selectedPets.includes(pet._id)}
+                    onChange={() => handlePetChange(pet._id)}
+                    className="hidden"
+                  />
+                  {pet.name}
+                </label>
+              ))}
+            </div>
+          </div>
 
-      {/* เลือกสัตว์เลี้ยง */}
-      <div>
-        <label className="font-semibold">เลือกสัตว์เลี้ยง:</label>
-        <div className="grid grid-cols-2 gap-2 mt-1 max-h-24 overflow-y-auto">
-          {pets.map(pet => (
-            <label
-              key={pet._id}
-              className={`px-3 py-1 rounded-full border text-xs text-center cursor-pointer ${
-                selectedPets.includes(pet._id)
-                  ? "bg-purple-600 text-white border-purple-600"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-100"
-              }`}
+          {/* ปุ่มบันทึก / ยกเลิก */}
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex-1 bg-gray-300 hover:bg-gray-400 text-black py-2 rounded-xl font-medium"
             >
-              <input
-                type="checkbox"
-                value={pet._id}
-                checked={selectedPets.includes(pet._id)}
-                onChange={() => handlePetChange(pet._id)}
-                className="hidden"
-              />
-              {pet.name}
-            </label>
-          ))}
-        </div>
+              ยกเลิก
+            </button>
+
+            <button
+              type="submit"
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl font-medium"
+            >
+              บันทึกการแก้ไข
+            </button>
+          </div>
+        </form>
       </div>
-
-      {/* ปุ่มบันทึก / ยกเลิก */}
-      <div className="flex gap-3 mt-4">
-
-        <button
-          type="button"
-          onClick={() => router.back()} // ⬅️ ย้อนกลับไปหน้าเดิม (หรือจะเปลี่ยนเส้นทางได้ เช่น router.push("/community"))
-          className="flex-1 bg-gray-300 hover:bg-gray-400 text-black py-2 rounded-xl font-medium"
-        >
-          ยกเลิก
-        </button>
-
-        <button
-          type="submit"
-          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl font-medium"
-        >
-          บันทึกการแก้ไข
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
+    </div>
   );
 }

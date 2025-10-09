@@ -7,26 +7,22 @@ export default function Community() {
   const [currentUser, setCurrentUser] = useState<{ _id: string } | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [pets, setPets] = useState<{ _id: string; name: string }[]>([]);
-  const [images, setImages] = useState<File[]>([]);
-  const [selectedPets, setSelectedPets] = useState<string[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
   const [myPosts, setMyPosts] = useState<any[]>([]);
   const [openImage, setOpenImage] = useState<string | null>(null);
   const [postDesc, setPostDesc] = useState("");
-  const [Nopeterror, setNopetError] = useState(""); 
-  const router = useRouter();
-
-
+  const [selectedPets, setSelectedPets] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]); // สำหรับแก้ไขโพสต์
+  const [newImages, setNewImages] = useState<File[]>([]); // รูปใหม่
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
 
   // โหลด token และ userId
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
     setToken(storedToken);
-    if (storedUserId) {
-      setCurrentUser({ _id: storedUserId });
-    }
+    if (storedUserId) setCurrentUser({ _id: storedUserId });
   }, []);
 
   // โหลดสัตว์เลี้ยง
@@ -62,65 +58,68 @@ export default function Community() {
       .catch((err) => console.error("Error fetching my posts:", err));
   }, [token, currentUser]);
 
-  // เปลี่ยน pet ที่เลือก
   const handlePetChange = (petId: string) => {
     setSelectedPets((prev) =>
       prev.includes(petId) ? prev.filter((p) => p !== petId) : [...prev, petId]
     );
   };
 
-  // ส่งโพสต์ใหม่
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!token || !currentUser) return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files) return;
+  setNewImages((prev) => [...prev, ...Array.from(e.target.files!)]);
+  };
 
-  // ✅ 1. ตรวจสอบว่ามีการเลือกสัตว์เลี้ยงอย่างน้อย 1 ตัว
-  if (selectedPets.length === 0) {
+
+  const handleRemoveNewImage = (idx: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !currentUser) return;
+
+    if (selectedPets.length === 0) {
       alert("กรุณาเลือกสัตว์เลี้ยงอย่างน้อย 1 ตัว");
       return;
     }
 
-  // ✅ 2. ตรวจสอบว่ามีการพิมพ์คำอธิบายหรืออัปโหลดรูปภาพอย่างน้อย 1 อย่าง
-  if (!postDesc.trim() && images.length === 0) {
-    alert("กรุณากรอกคำอธิบายหรือเพิ่มรูปภาพอย่างน้อย 1 อย่าง");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("PostDesc", postDesc);
-  formData.append("owner", currentUser._id);
-  selectedPets.forEach((petId) => formData.append("pets", petId));
-  images.forEach((file) => formData.append("images", file));
-
-  try {
-    const res = await fetch("http://localhost:3002/api/community-posts", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      alert(data.error);
+    if (!postDesc.trim() && newImages.length === 0) {
+      alert("กรุณากรอกคำอธิบายหรือเพิ่มรูปภาพอย่างน้อย 1 อย่าง");
       return;
     }
 
-    const newPost = await res.json();
-    setPosts((prev) => [newPost, ...prev]);
-    setMyPosts((prev) => [newPost, ...prev]);
+    const formData = new FormData();
+    formData.append("PostDesc", postDesc);
+    formData.append("owner", currentUser._id);
+    selectedPets.forEach((petId) => formData.append("pets", petId));
+    newImages.forEach((file) => formData.append("images", file));
 
-    // ✅ Reset form
-    setPostDesc("");
-    setImages([]);
-    setSelectedPets([]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    try {
+      const res = await fetch("http://localhost:3002/api/community-posts", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
 
-  } catch (err) {
-    console.error("❌ Error creating post:", err);
-  }
-};
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error);
+        return;
+      }
 
-  // ลบโพสต์
+      const newPost = await res.json();
+      setPosts((prev) => [newPost, ...prev]);
+      setMyPosts((prev) => [newPost, ...prev]);
+
+      setPostDesc("");
+      setNewImages([]);
+      setSelectedPets([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (err) {
+      console.error("❌ Error creating post:", err);
+    }
+  };
+
   const handleDelete = async (postId: string) => {
     if (!token) return;
     if (!confirm("คุณแน่ใจว่าต้องการลบโพสต์นี้?")) return;
@@ -133,7 +132,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       if (!res.ok) throw new Error("Failed to delete post");
 
       setPosts((prev) => prev.filter((p) => p._id !== postId));
@@ -142,14 +140,14 @@ const handleSubmit = async (e: React.FormEvent) => {
       console.error("Error deleting post:", err);
     }
   };
-const handleEdit = (postId: string) => {
-  if (!token) {
-    alert("กรุณาเข้าสู่ระบบก่อน");
-    return;
-  }
-  router.push(`/community/editPost/${postId}`);
-};
 
+  const handleEdit = (postId: string) => {
+    if (!token) {
+      alert("กรุณาเข้าสู่ระบบก่อน");
+      return;
+    }
+    router.push(`/community/editPost/${postId}`);
+  };
 
   return (
     <div className="font-sans flex flex-col min-h-screen w-full bg-[#f5f5f5]">
@@ -157,104 +155,95 @@ const handleEdit = (postId: string) => {
       <div className="flex justify-center w-full bg-[#f5f5f5] py-8 ">
         <div className="flex gap-6 w-full max-w-7xl px-6 sm:px-6 lg:px-8 ">
           {/* Sidebar - Create Post */}
-            <div className="flex-none w-60 sticky top-32 self-start">
-              <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-                <div className="p-4">
-                  <p className="text-lg font-bold text-gray-800 mb-4">สร้างโพสต์</p>
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <textarea
-                      value={postDesc}
-                      onChange={(e) => setPostDesc(e.target.value)}
-                      placeholder="เขียนคำบรรยายภาพ..."
-                      className="text-black w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
-                      rows={4}
-                      
+          <div className="flex-none w-60 sticky top-32 self-start">
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+              <div className="p-4">
+                <p className="text-lg font-bold text-gray-800 mb-4">สร้างโพสต์</p>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <textarea
+                    value={postDesc}
+                    onChange={(e) => setPostDesc(e.target.value)}
+                    placeholder="เขียนคำบรรยายภาพ..."
+                    className="text-black w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
+                    rows={4}
+                  />
+                  <label className="cursor-pointer flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+                    ✚ อัปโหลดรูปภาพ <br />
+                    (สูงสุด 4 ภาพ)
+                    <input
+                      type="file"
+                      multiple
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
                     />
-                    <label className="cursor-pointer flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
-                     ✚ อัปโหลดรูปภาพ <br />
-                      (สูงสุด 4 ภาพ)
-                      <input
-                        type="file"
-                        multiple
-                        ref={fileInputRef}
-                        onChange={(e) =>
-                          e.target.files && setImages(Array.from(e.target.files))
-                        }
-                        className="hidden"
-                      />
-                    </label>
-                    {images.length > 0 && (
-                      <div className="grid grid-cols-2 gap-2 mt-1">
-                        {images.map((img, idx) => {
-                          const url =
-                            typeof img === "string" ? img : URL.createObjectURL(img);
-                          return (
-                            <div
-                              key={idx}
-                              className="relative w-full pb-[100%] rounded-md overflow-hidden border border-gray-200 shadow-sm"
-                            >
-                              <img
-                                src={url}
-                                alt={`preview-${idx}`}
-                                className="absolute top-0 left-0 w-full h-full object-cover"
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setImages((prev) => prev.filter((_, i) => i !== idx))
-                                }
-                                className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                  </label>
 
-                    {/* Select Pets */}
-                      <div>
-                        <label className="font-semibold text-gray-700">เลือกสัตว์เลี้ยง:</label>
-                        {pets.length > 0 ? (
+                  {/* Preview รูปใหม่ */}
+                  {newImages.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2 mt-1">
+                      {newImages.map((img, idx) => {
+                        const url = URL.createObjectURL(img);
+                        return (
                           <div
-                            className="grid grid-cols-2 gap-2 mt-1 overflow-y-auto"
-                            style={{ maxHeight: `${3 * 2}rem` }}
+                            key={idx}
+                            className="relative w-full pb-[100%] rounded-md overflow-hidden border border-gray-200 shadow-sm"
                           >
-                            {pets.map((pet) => (
-                              <label
-                                key={pet._id}
-                                className={`px-3 py-1 rounded-full border text-center text-xs truncate transition ${
-                                  selectedPets.includes(pet._id)
-                                    ? "bg-purple-600 text-white border-purple-600 shadow-sm"
-                                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
-                                } cursor-pointer`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  value={pet._id}
-                                  checked={selectedPets.includes(pet._id)}
-                                  onChange={() => handlePetChange(pet._id)}
-                                  className="hidden"
-                                />
-                                {pet.name}
-                              </label>
-                            ))}
+                            <img
+                              src={url}
+                              alt={`preview-${idx}`}
+                              className="absolute top-0 left-0 w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveNewImage(idx)}
+                              className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              ×
+                            </button>
                           </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm mt-1">คุณยังไม่มีสัตว์เลี้ยง</p>
-                        )}
+                        );
+                      })}
+                    </div>
+                  )}
 
+                  {/* Select Pets */}
+                  <div>
+                    <label className="font-semibold text-gray-700">เลือกสัตว์เลี้ยง:</label>
+                    {pets.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2 mt-1 overflow-y-auto" style={{ maxHeight: `${3 * 2}rem` }}>
+                        {pets.map((pet) => (
+                          <label
+                            key={pet._id}
+                            className={`px-3 py-1 rounded-full border text-center text-xs truncate transition ${
+                              selectedPets.includes(pet._id)
+                                ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                            } cursor-pointer`}
+                          >
+                            <input
+                              type="checkbox"
+                              value={pet._id}
+                              checked={selectedPets.includes(pet._id)}
+                              onChange={() => handlePetChange(pet._id)}
+                              className="hidden"
+                            />
+                            {pet.name}
+                          </label>
+                        ))}
                       </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm mt-1">คุณยังไม่มีสัตว์เลี้ยง</p>
+                    )}
+                  </div>
 
-
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl shadow-md transition mt-2">
-                      โพสต์
-                    </button>
-                  </form>
-                </div>
+                  <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl shadow-md transition mt-2">
+                    โพสต์
+                  </button>
+                </form>
               </div>
             </div>
+          </div>
 
           {/* Main Feed */}
             <div className="border-x border-gray-300 flex-1 ">

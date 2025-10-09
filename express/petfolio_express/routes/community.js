@@ -186,21 +186,22 @@ router.post("/updatePost/:id", (req, res) => {
       // อัปเดตรูป ถ้ามีการอัปโหลดใหม่หรือส่งรูปเดิมมาด้วย
       let updatedImages = [];
 
-      // 1️⃣ ถ้ามีรูปเดิมที่ยังไม่ลบ
+      // 1️⃣ เก็บรูปเดิมที่ยังไม่ลบ
       if (req.body.existingImages) {
         updatedImages = Array.isArray(req.body.existingImages)
           ? req.body.existingImages
           : [req.body.existingImages];
       }
 
-      // 2️⃣ ถ้ามีรูปใหม่
+      // 2️⃣ เพิ่มรูปใหม่ (ไม่ทับ)
       if (req.files && req.files.length > 0) {
         const newImages = req.files.map(file => `/uploads/Post/${file.filename}`);
         updatedImages = [...updatedImages, ...newImages];
       }
 
-      // 3️⃣ อัปเดต post.images
+      // 3️⃣ บันทึก
       post.images = updatedImages;
+
 
 
       await post.save();
