@@ -7,12 +7,13 @@ export default function Community() {
   const [currentUser, setCurrentUser] = useState<{ _id: string } | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [pets, setPets] = useState<{ _id: string; name: string }[]>([]);
-  const [postDesc, setPostDesc] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [selectedPets, setSelectedPets] = useState<string[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
   const [myPosts, setMyPosts] = useState<any[]>([]);
   const [openImage, setOpenImage] = useState<string | null>(null);
+  const [postDesc, setPostDesc] = useState("");
+  const [Nopeterror, setNopetError] = useState(""); 
   const router = useRouter();
 
 
@@ -69,43 +70,55 @@ export default function Community() {
   };
 
   // ส่งโพสต์ใหม่
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!token || !currentUser) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!token || !currentUser) return;
 
-    const formData = new FormData();
-    formData.append("PostDesc", postDesc);
-    formData.append("owner", currentUser._id);
-    selectedPets.forEach((petId) => formData.append("pets", petId));
-    images.forEach((file) => formData.append("images", file));
-
-    try {
-      const res = await fetch("http://localhost:3002/api/community-posts", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        // ✅ แสดงป็อปอัป error
-        alert(data.error);
-        return;
-      }
-
-      const newPost = await res.json();
-      setPosts((prev) => [newPost, ...prev]);
-      setMyPosts((prev) => [newPost, ...prev]);
-
-      // reset form
-      setPostDesc("");
-      setImages([]);
-      setSelectedPets([]);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch (err) {
-      console.error("Error creating post:", err);
+  // ✅ 1. ตรวจสอบว่ามีการเลือกสัตว์เลี้ยงอย่างน้อย 1 ตัว
+  if (selectedPets.length === 0) {
+      alert("กรุณาเลือกสัตว์เลี้ยงอย่างน้อย 1 ตัว");
+      return;
     }
-  };
+
+  // ✅ 2. ตรวจสอบว่ามีการพิมพ์คำอธิบายหรืออัปโหลดรูปภาพอย่างน้อย 1 อย่าง
+  if (!postDesc.trim() && images.length === 0) {
+    alert("กรุณากรอกคำอธิบายหรือเพิ่มรูปภาพอย่างน้อย 1 อย่าง");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("PostDesc", postDesc);
+  formData.append("owner", currentUser._id);
+  selectedPets.forEach((petId) => formData.append("pets", petId));
+  images.forEach((file) => formData.append("images", file));
+
+  try {
+    const res = await fetch("http://localhost:3002/api/community-posts", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      alert(data.error);
+      return;
+    }
+
+    const newPost = await res.json();
+    setPosts((prev) => [newPost, ...prev]);
+    setMyPosts((prev) => [newPost, ...prev]);
+
+    // ✅ Reset form
+    setPostDesc("");
+    setImages([]);
+    setSelectedPets([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+
+  } catch (err) {
+    console.error("❌ Error creating post:", err);
+  }
+};
 
   // ลบโพสต์
   const handleDelete = async (postId: string) => {
@@ -155,7 +168,7 @@ const handleEdit = (postId: string) => {
                       placeholder="เขียนคำบรรยายภาพ..."
                       className="text-black w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
                       rows={4}
-                      required
+                      
                     />
                     <label className="cursor-pointer flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
                      ✚ อัปโหลดรูปภาพ <br />
@@ -201,37 +214,38 @@ const handleEdit = (postId: string) => {
                     )}
 
                     {/* Select Pets */}
-                    <div>
-                      <label className="font-semibold text-gray-700">เลือกสัตว์เลี้ยง:</label>
-                      {pets.length > 0 ? (
-                        <div
-                          className="grid grid-cols-2 gap-2 mt-1 overflow-y-auto"
-                          style={{ maxHeight: `${3 * 2}rem` }} // 3 บรรทัด * row height ประมาณ 1.75rem
-                        >
-                          {pets.map((pet) => (
-                            <label
-                              key={pet._id}
-                              className={`px-3 py-1 rounded-full border text-center text-xs truncate transition ${
-                                selectedPets.includes(pet._id)
-                                  ? "bg-purple-600 text-white border-purple-600 shadow-sm"
-                                  : "border-gray-300 text-gray-700 hover:bg-gray-100"
-                              } cursor-pointer`}
-                            >
-                              <input
-                                type="checkbox"
-                                value={pet._id}
-                                checked={selectedPets.includes(pet._id)}
-                                onChange={() => handlePetChange(pet._id)}
-                                className="hidden"
-                              />
-                              {pet.name}
-                            </label>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-400 text-sm mt-1">คุณยังไม่มีสัตว์เลี้ยง</p>
-                      )}
-                    </div>
+                      <div>
+                        <label className="font-semibold text-gray-700">เลือกสัตว์เลี้ยง:</label>
+                        {pets.length > 0 ? (
+                          <div
+                            className="grid grid-cols-2 gap-2 mt-1 overflow-y-auto"
+                            style={{ maxHeight: `${3 * 2}rem` }}
+                          >
+                            {pets.map((pet) => (
+                              <label
+                                key={pet._id}
+                                className={`px-3 py-1 rounded-full border text-center text-xs truncate transition ${
+                                  selectedPets.includes(pet._id)
+                                    ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                                } cursor-pointer`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  value={pet._id}
+                                  checked={selectedPets.includes(pet._id)}
+                                  onChange={() => handlePetChange(pet._id)}
+                                  className="hidden"
+                                />
+                                {pet.name}
+                              </label>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm mt-1">คุณยังไม่มีสัตว์เลี้ยง</p>
+                        )}
+                        
+                      </div>
 
 
                     <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl shadow-md transition mt-2">
@@ -304,7 +318,7 @@ const handleEdit = (postId: string) => {
                                     key={idx}
                                     src={`http://localhost:3002${img}`}
                                     alt={`post-${idx}`}
-                                    className="w-full h-40 object-cover rounded-xl cursor-pointer"
+                                    className="w-full h-64 object-cover rounded-xl cursor-pointer"
                                     onClick={() => setOpenImage(`http://localhost:3002${img}`)}
                                   />
                                 ))}
@@ -406,7 +420,7 @@ const handleEdit = (postId: string) => {
                                     key={idx}
                                     src={`http://localhost:3002${img}`}
                                     alt={`post-${idx}`}
-                                    className="w-full h-64 object-cover rounded-xl cursor-pointer"
+                                    className="w-full h-32 object-cover rounded-xl cursor-pointer"
                                     onClick={() => setOpenImage(`http://localhost:3002${img}`)}
                                   />
                                 ))}
@@ -419,7 +433,7 @@ const handleEdit = (postId: string) => {
                                 <img
                                   src={`http://localhost:3002${post.images[0]}`}
                                   alt="post-main"
-                                  className="w-full h-64 object-cover rounded-xl cursor-pointer"
+                                  className="w-full h-32 object-cover rounded-xl cursor-pointer"
                                   onClick={() => setOpenImage(`http://localhost:3002${post.images[0]}`)}
                                 />
                                 <div className="grid grid-cols-2 gap-2">
@@ -428,7 +442,7 @@ const handleEdit = (postId: string) => {
                                       key={idx}
                                       src={`http://localhost:3002${img}`}
                                       alt={`post-${idx}`}
-                                      className="w-full h-40 object-cover rounded-xl cursor-pointer"
+                                      className="w-full h-32 object-cover rounded-xl cursor-pointer"
                                       onClick={() => setOpenImage(`http://localhost:3002${img}`)}
                                     />
                                   ))}
@@ -444,7 +458,7 @@ const handleEdit = (postId: string) => {
                                     <img
                                       src={`http://localhost:3002${img}`}
                                       alt={`post-${idx}`}
-                                      className="w-full h-48 object-cover rounded-xl cursor-pointer"
+                                      className="w-full h-32 object-cover rounded-xl cursor-pointer"
                                       onClick={() => setOpenImage(`http://localhost:3002${img}`)}
                                     />
                                     {/* ถ้ามีมากกว่า 4 รูป ให้แสดง overlay "+N" */}

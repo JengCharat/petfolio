@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const communityPostSchema = new mongoose.Schema({
-  PostDesc: { type: String, required: true },
+  PostDesc: { type: String },
   images: [{ type: String }], 
-  pets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pet" }], 
+  pets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pet" ,required: true }], 
   likes: { type: Number, default: 0 },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "communityComment" }],
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // เชื่อม User
