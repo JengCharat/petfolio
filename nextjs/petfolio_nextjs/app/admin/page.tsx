@@ -281,8 +281,9 @@ export default function Admin() {
               (user.email ?? "").toLowerCase().includes(searchTerm.toLowerCase())
             );
     //
-    //
-    //
+    //include example
+    //console.log(text.includes("World")); // true
+    //console.log(text.includes("world")); // false เพราะตัว W กับ w ต่างกัน
     //
     //
     //
