@@ -48,6 +48,7 @@ export default function Register() {
 
   return (
     <>
+    <div className="font-sans  bg-[#fffff]">
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
         {/* Logo */}
         <div>
@@ -112,7 +113,9 @@ export default function Register() {
           >
             สมัครสมาชิก
           </button>
+          
         </div>
+      </div>
       </div>
     </>
 

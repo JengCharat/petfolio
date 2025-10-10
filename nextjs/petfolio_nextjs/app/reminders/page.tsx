@@ -284,39 +284,45 @@ export default function Reminder() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Cards */}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 justify-center max-w-6xl mx-auto">
-        {/* เร่งด่วน */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center shadow-md transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
-          <div className="px-23 text-4xl text-red-500 mb-4 mx-auto"><AiOutlineAlert /></div>
-          <div className="text-lg font-semibold text-red-600 mb-1">เร่งด่วน</div>
-          <div className="text-md text-red-600">{countUrgent} รายการ</div>
-          <div className="text-sm text-gray-500 pt-3">*รายการที่เลยกำหนด*</div>
-        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  {/* Dashboard Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 justify-center max-w-6xl mx-auto">
 
-        {/* วันนี้ */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center shadow-md transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
-          <div className="px-23 text-4xl text-orange-500 mb-4 mx-auto"><AiOutlineClockCircle /></div>
-          <div className="text-lg font-semibold text-orange-600 mb-1">วันนี้</div>
-          <div className="text-md text-orange-500">{countToday} รายการ</div>
-          <div className="text-sm text-gray-500 pt-3">*รายการที่กำหนดไว้ในวันนี้*</div>
-        </div>
+    {/* เร่งด่วน */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineAlert className="text-4xl text-red-500 mb-4" />
+      <div className="text-lg font-semibold text-red-600 mb-1">เร่งด่วน</div>
+      <div className="text-md text-red-600">{countUrgent} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่เลยกำหนด*</div>
+    </div>
 
-        {/* สัปดาห์นี้ */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center shadow-md transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
-          <div className="px-23 text-4xl text-blue-500 mb-4 mx-auto"><AiOutlineCalendar /></div>
-          <div className="text-lg font-semibold text-blue-600 mb-1">สัปดาห์นี้</div>
-          <div className="text-md text-blue-500">{countThisWeek} รายการ</div>
-          <div className="text-sm text-gray-500 pt-3">*รายการที่กำหนดไว้ในสัปดาห์นี้*</div>
-        </div>
+    {/* วันนี้ */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineClockCircle className="text-4xl text-orange-500 mb-4" />
+      <div className="text-lg font-semibold text-orange-600 mb-1">วันนี้</div>
+      <div className="text-md text-orange-500">{countToday} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่กำหนดไว้ในวันนี้*</div>
+    </div>
 
-        {/* เสร็จแล้ว */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center shadow-md transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
-          <div className="px-23 text-4xl text-green-500 mb-4 mx-auto "><AiOutlineCheckCircle /></div>
-          <div className="text-lg font-semibold text-green-600 mb-1">เสร็จแล้ว</div>
-          <div className="text-md text-green-500">{countCompleted} รายการ</div>
-          <div className="text-sm text-gray-500 pt-3">*รายการที่เสร็จสิ้นแล้ว*</div>
-        </div>
-      </div>
+    {/* สัปดาห์นี้ */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineCalendar className="text-4xl text-blue-500 mb-4" />
+      <div className="text-lg font-semibold text-blue-600 mb-1">สัปดาห์นี้</div>
+      <div className="text-md text-blue-500">{countThisWeek} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่กำหนดไว้ในสัปดาห์นี้*</div>
+    </div>
+
+    {/* เสร็จแล้ว */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineCheckCircle className="text-4xl text-green-500 mb-4" />
+      <div className="text-lg font-semibold text-green-600 mb-1">เสร็จแล้ว</div>
+      <div className="text-md text-green-500">{countCompleted} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่เสร็จสิ้นแล้ว*</div>
+    </div>
+
+  </div>
+</div>
+
 
         {/* Header + Add Button */}
         <div className="flex justify-between items-center mb-8">
