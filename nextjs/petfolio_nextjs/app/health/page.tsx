@@ -34,11 +34,12 @@ type HealthRecord = {
 const BASE_URL = "http://localhost:3002/api";
 
 const typeEmoji: Record<string, string> = {
+     dog: "🐕",
     cat: "🐱",
-    dog: "🐶",
+    bird: "🐦",
+    fish: "🐠",
     rabbit: "🐰",
     hamster: "🐹",
-    bird: "🐦",
 };
 
 const treatmentLabels: Record<Treatment, string> = {
@@ -153,14 +154,12 @@ export default function PetApp() {
 
         try {
             if (isEdit && selectedRecord) {
-                // PUT
                 await fetch(`${BASE_URL}/health/${selectedRecord._id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                     body: JSON.stringify(payload),
                 });
             } else {
-                // POST
                 await fetch(`${BASE_URL}/health`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -193,128 +192,172 @@ export default function PetApp() {
     }, [token, currentUser]);
 
     return (
-        <>
-            <Navbar />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="font-sans bg-[#f9f9f9] min-h-screen">
+  <Navbar />
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-6">ประวัติสุขภาพสัตว์เลี้ยง</h2>
-                    <button
-                        onClick={() => { setShowFormModal(true); setIsEdit(false); setForm({}); }}
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg"
-                    >
-                        ➕ เพิ่มประวัติ
-                    </button>
-                </div>
-
-                {/* รายการสัตว์เลี้ยง */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4 ">
-                    {pets.map((p) => (
-                        <div
-                            key={p._id}
-                            onClick={() => setSelectedPet(p)}
-                            className="p-4 bg-purple-200 rounded-lg shadow hover:shadow-md cursor-pointer border border-gray-300"
-                        >
-                            <h3 className="text-lg font-semibold">
-                                {p.name} {typeEmoji[p.type ?? ""] ?? ""}
-                            </h3>
-                            <p className="mb-2">{p.type} {p.breed ? `(สายพันธ์ุ : ${p.breed})` : ""}</p>
-                            <p className="text-red-500"> <strong>⚠️ ข้อมูลสำคัญทางการแพทย์</strong>  </p>
-                            <p className="text-red-500">: {p.medicalConditions}</p>
-                            
-                        </div>
-                    ))}
-                </div>
-
-                <hr className="my-4 border-t border-gray-400 mx-auto w-11/12" />
-
-                {selectedPet && (
-                    <div className="mb-6 flex justify-between items-center">
-                        <h2 className="text-2xl font-bold text-gray-800">
-                            ประวัติสุขภาพ: {selectedPet.name}
-                        </h2>
-                        <button onClick={() => setSelectedPet(null)} className="px-4 py-2 bg-gray-500 text-white rounded">
-                            แสดงทั้งหมด
-                        </button>
-                    </div>
-                )}
-
-                {records.length === 0 ? (
-                    <p className="text-gray-500">ยังไม่มีข้อมูลสุขภาพ</p>
-                ) : (
-                    <ul className="space-y-4">
-                        {records
-                            .filter((rec) => !selectedPet || rec.pet._id === selectedPet._id)
-                            .map((rec) => (
-                                <li key={rec._id} className="p-4 bg-gray-200 rounded-lg shadow hover:shadow-md">
-                                    <div className="flex justify-between items-center">
-                                        <h3 className="font-semibold">
-                                            {rec.pet?.name} {typeEmoji[rec.pet?.type ?? ""] ?? ""} - {treatmentLabels[rec.type]}
-                                        </h3>
-                                        <div className="space-x-2">
-                                            <button
-                                                onClick={() => { setSelectedRecord(rec); setShowRecordModal(true); }}
-                                                className="px-3 py-1 bg-purple-600 text-white rounded "
-                                            >
-                                                ดูรายละเอียด
-                                            </button>
-
-                                        </div>
-                                    </div>
-                                    <p><strong>วันที่ : </strong> {formatDate(rec.date)}</p>
-                                    <p><strong>ลายละเอียด : </strong> {rec.detail || "-"}</p>
-                                </li>
-                            ))}
-                    </ul>
-                )}
-
-                {/* Modal ดู record */}
-{showRecordModal && selectedRecord && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-    <div className="bg-white p-6 rounded-xl max-w-md w-full relative">
-      {/* ปุ่ม X มุมบนขวา */}
+    {/* Header + Add Button */}
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="text-3xl font-bold text-gray-800">ประวัติสุขภาพสัตว์เลี้ยง</h2>
       <button
-        onClick={() => setShowRecordModal(false)}
-        className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 font-bold text-xl"
+        onClick={() => { setShowFormModal(true); setIsEdit(false); setForm({}); }}
+        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-shadow shadow-md"
       >
-        ✕
+        ➕ เพิ่มประวัติ
       </button>
-
-      <h3 className="text-xl font-bold mb-4">
-        {selectedRecord.pet?.name} {typeEmoji[selectedRecord.pet?.type ?? ""] ?? ""} - {treatmentLabels[selectedRecord.type]}
-      </h3>
-      <p><strong>วันที่ : </strong> {formatDate(selectedRecord.date)}</p>
-      <p><strong>สถานที่ : </strong> {selectedRecord.clinic || "-"}</p>
-      <p><strong>รายละเอียด : </strong> {selectedRecord.detail || "-"}</p>
-      <p><strong>ค่าใช้จ่าย : </strong> {selectedRecord.cost} บาท</p>
-
-      {/* ปุ่มแก้ไข/ลบ อยู่ชิดล่างขวา */}
-      <div className="flex justify-end space-x-2 mt-6">
-        <button
-          onClick={() => openEditModal(selectedRecord)}
-          className="px-4 py-2 bg-yellow-500 text-white rounded"
-        >
-          ✏️ แก้ไข
-        </button>
-        <button
-          onClick={() => deleteRecord(selectedRecord._id)}
-          className="px-4 py-2 bg-red-600 text-white rounded"
-        >
-          ลบ
-        </button>
-      </div>
     </div>
+
+    
+    {/* รายการสัตว์เลี้ยง แนวนอน */}
+<div className="flex space-x-4 overflow-x-auto pb-4">
+  {pets.map((p) => (
+    <div
+      key={p._id}
+      onClick={() => setSelectedPet(p)}
+      className={`min-w-[250px] flex-shrink-0 bg-white rounded-2xl p-6 shadow-md flex flex-col items-center transition-all duration-200
+        ${selectedPet?._id === p._id ? "border-2 border-purple-500 shadow-lg" : "border border-gray-200 hover:shadow-lg"}`}
+    >
+      <div className="text-5xl mb-2">{typeEmoji[p.type ?? ""] ?? ""}</div>
+      <h3 className="text-xl font-bold">{p.name}</h3>
+      <p className="mb-1 text-gray-500">{p.breed ? ` ${p.breed}` : ""}</p>
+      <p className="text-red-500 font-semibold mb-1">⚠️ โรคประจำตัว/อาการแพ้</p>
+      <p className="text-red-500">{p.medicalConditions || "-"}</p>
+    </div>
+  ))}
+</div>
+
+
+    
+
+
+    <hr className="my-4 border-t border-gray-300 mx-auto w-full" />
+
+    {/* แสดงบันทึกสุขภาพเมื่อเลือกสัตว์ */}
+{selectedPet ? (
+  <div>
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="text-2xl font-bold text-gray-800">ประวัติสุขภาพ - {selectedPet.name}</h3>
+    </div>
+
+    {records.filter((rec) => rec.pet._id === selectedPet._id).length === 0 ? (
+      <p className="text-gray-500">ยังไม่มีข้อมูลสุขภาพสำหรับ {selectedPet.name}</p>
+    ) : (
+      <ul className="space-y-4">
+        {records
+          .filter((rec) => rec.pet._id === selectedPet._id)
+          .map((rec) => (
+            <li
+              key={rec._id}
+              className="p-4 bg-gray-50 rounded-lg shadow hover:shadow-lg transition flex flex-col"
+            >
+              <div className="mb-2">
+                <h4 className="font-semibold">{treatmentLabels[rec.type]}</h4>
+              </div>
+
+              <p className="text-gray-700"><strong>วันที่:</strong> {formatDate(rec.date)}</p>
+              <p className="text-gray-700"><strong>รายละเอียด:</strong> {rec.detail || "-"}</p>
+
+              {/* ปุ่มอยู่ขวาล่าง */}
+              <div className="mt-auto flex justify-end">
+                <button
+                  onClick={() => { setSelectedRecord(rec); setShowRecordModal(true); }}
+                  className="px-3 py-1 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition"
+                >
+                  ดูรายละเอียด
+                </button>
+              </div>
+            </li>
+          ))}
+      </ul>
+    )}
   </div>
-)}
 
 
+    ) : (
+      <p className="text-gray-500 text-center">เลือกสัตว์เลี้ยงเพื่อดูประวัติสุขภาพ</p>
+    )}
 
-                {/* Modal เพิ่ม / แก้ไข record */}
-                {showFormModal && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
-                            <h3 className="text-xl font-bold mb-4">{isEdit ? "แก้ไขประวัติสุขภาพ" : "เพิ่มประวัติสุขภาพ"}</h3>
-                            <form onSubmit={handleFormSubmit} className="space-y-3">
+    {/* Modal ดู record */}
+    {showRecordModal && selectedRecord && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white p-6 rounded-2xl max-w-md w-full shadow-lg relative">
+          
+          {/* ข้อมูลบันทึกสุขภาพ */}
+<div className="mb-6 text-center">
+    <div className="mb-6 text-center">
+  <h3 className="text-4xl font-bold text-gray-800 text-center">
+    {selectedRecord.pet?.name}  
+  </h3>
+  </div>
+   <div className="space-y-3 text-gray-700">
+
+    <div className="flex justify-between">
+    <strong className="font-medium">ประเภทการดูแล :</strong>
+    <span className="text-end">{treatmentLabels[selectedRecord.type]}</span>
+  </div>
+
+  <div className="flex justify-between">
+    <strong className="font-medium">วันที่ :</strong>
+    <span className="text-end">{formatDate(selectedRecord.date)}</span>
+  </div>
+
+  <div className="flex justify-between">
+    <strong className="font-medium">สถานที่ :</strong>
+    <span className="text-end">{selectedRecord.clinic || "-"}</span>
+  </div>
+
+  <div className="flex justify-between">
+    <strong className="font-medium">รายละเอียด :</strong>
+    <span className="text-end">{selectedRecord.detail || "-"}</span>
+  </div>
+
+  <div className="flex justify-between">
+    <strong className="font-medium">ค่าใช้จ่าย :</strong>
+    <span className="text-end">{selectedRecord.cost ?? "-"} บาท</span>
+  </div>
+
+   
+  </div>
+</div>
+<div className="flex justify-between items-center mt-6">
+  {/* ปุ่มยกเลิก ซ้าย */}
+  <button
+    type="button"
+    onClick={() => setShowRecordModal(false)}
+    className="px-4 py-2 hover:bg-gray-50   border border-gray-300 text-gray-700 rounded-xl  transition"
+  >
+    ยกเลิก
+  </button>
+
+  {/* ปุ่มแก้ไข / ลบ ขวา */}
+  <div className="flex space-x-2">
+    <button
+      onClick={() => openEditModal(selectedRecord)}
+      className="px-4 py-2 bg-yellow-500 text-white rounded-xl hover:bg-yellow-600 transition"
+    >
+      แก้ไข
+    </button>
+
+    <button
+      onClick={() => deleteRecord(selectedRecord._id)}
+      className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition"
+    >
+      ลบ
+    </button>
+  </div>
+</div>
+
+
+        </div>
+      </div>
+    )}
+
+    {/* Modal เพิ่ม / แก้ไข record */}
+    {showFormModal && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 shadow-lg">
+          <h3 className="text-xl font-bold mb-4">{isEdit ? "แก้ไขประวัติสุขภาพ" : "เพิ่มประวัติสุขภาพ"}</h3>
+          <form onSubmit={handleFormSubmit} className="space-y-3">
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">เลือกสัตว์เลี้ยง</label>
                                     <select
@@ -390,24 +433,30 @@ export default function PetApp() {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     />
                                 </div>
+                                <div className="flex space-x-4 pt-4">
+  <button
+    type="button"
+    onClick={() => { setShowFormModal(false); setIsEdit(false); setForm({}); }}
+    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+  >
+    ยกเลิก
+  </button>
 
-                                <div className="flex justify-between">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setShowFormModal(false); setIsEdit(false); setForm({}); }}
-                                        className="px-4 py-2 bg-gray-400 text-white rounded"
-                                    >
-                                        ยกเลิก
-                                    </button>
-                                    <button type="submit" className={`px-4 py-2 ${isEdit ? "bg-yellow-500" : "bg-blue-600"} text-white rounded`}>
-                                        {isEdit ? "บันทึกการแก้ไข" : "บันทึก"}
-                                    </button>
-                                </div>
+  <button
+    type="submit"
+    className={`flex-1 px-6 py-3 ${isEdit ? "bg-yellow-500" : "bg-purple-600 hover:bg-purple-700"} text-white rounded-xl`}
+  >
+    {isEdit ? "บันทึกการแก้ไข" : "บันทึก"}
+  </button>
+</div>
+
                             </form>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </>
+        </div>
+      </div>
+    )}
+
+  </div>
+</div>
+
     );
 }

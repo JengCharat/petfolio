@@ -6,6 +6,9 @@ import { jwtDecode } from "jwt-decode";
 import { addPetService } from "../services/pet_page_service";
 import { useRouter } from 'next/navigation'
 import { Router } from "next/router";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import { FaTasks } from "react-icons/fa"; // สำหรับงานที่ยังไม่เสร็จ
+
 interface JWTData {
   id: string;
   email: string;
@@ -295,67 +298,74 @@ export default function First_page() {
   /////////////////////////////this is return//////////////////////////////////
   return (
     <>
+        <div className="font-sans  bg-[#fffff]">
+
       <Navbar />
       <div className="text-center p-6">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">สวัสดี {userEmail}👋</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-4">สวัสดี {userEmail} </h1>
         <p className="text-xl text-gray-600">วันนี้สัตว์เลี้ยงของคุณเป็นอย่างไรบ้าง</p>
       </div>
       {/* Pet Count / Quick Stats */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <div className="bg-white rounded-2xl p-4 shadow-lg text-center hover:shadow-xl transition">
             <div className="text-3xl mb-2">🐱</div>
-            <div className="text-xl font-bold text-pink-600">{petCount.cat || 0}</div>
+            <div className="text-xl font-bold text-black">{petCount.cat || 0}</div>
             <div className="text-gray-600 text-sm">แมว</div>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-lg text-center hover:shadow-xl transition">
             <div className="text-3xl mb-2">🐶</div>
-            <div className="text-xl font-bold text-purple-600">{petCount.dog || 0}</div>
+            <div className="text-xl font-bold text-black">{petCount.dog || 0}</div>
             <div className="text-gray-600 text-sm">สุนัข</div>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-lg text-center hover:shadow-xl transition">
             <div className="text-3xl mb-2">🐦</div>
-            <div className="text-xl font-bold text-blue-500">{petCount.bird || 0}</div>
+            <div className="text-xl font-bold text-black">{petCount.bird || 0}</div>
             <div className="text-gray-600 text-sm">นก</div>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-lg text-center hover:shadow-xl transition">
             <div className="text-3xl mb-2">🐠</div>
-            <div className="text-xl font-bold text-cyan-500">{petCount.fish || 0}</div>
+            <div className="text-xl font-bold text-black">{petCount.fish || 0}</div>
             <div className="text-gray-600 text-sm">ปลา</div>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-lg text-center hover:shadow-xl transition">
             <div className="text-3xl mb-2">🐰</div>
-            <div className="text-xl font-bold text-orange-500">{petCount.rabbit || 0}</div>
+            <div className="text-xl font-bold text-black">{petCount.rabbit || 0}</div>
             <div className="text-gray-600 text-sm">กระต่าย</div>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-lg text-center hover:shadow-xl transition">
             <div className="text-3xl mb-2">🐹</div>
-            <div className="text-xl font-bold text-green-500">{petCount.hamster || 0}</div>
+            <div className="text-xl font-bold text-black">{petCount.hamster || 0}</div>
             <div className="text-gray-600 text-sm">แฮมสเตอร์</div>
           </div>
         </div>
         <div>
-          {/* Weekly Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-4 mb-8">
-            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-2xl p-6 shadow-lg mb-6 text-center">
-              <div className="text-3xl mb-2">📅</div>
-              <div className="text-lg font-bold">สัปดาห์นี้</div>
-              <div className="text-sm opacity-90">{countThisWeek} รายการ</div>
-            </div>
+<div>
+  {/* Weekly Summary */}
+  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
+    
+    {/* สัปดาห์นี้ */}
+    <div className="bg-white rounded-2xl p-6 shadow-lg mb-6 text-center flex flex-col items-center">
+      <FaRegCalendarAlt className="text-blue-500 text-3xl mb-2" />
+      <div className="text-lg font-bold text-blue-500">สัปดาห์นี้</div>
+      <div className="text-md text-blue-400">{countThisWeek} รายการ</div>
+    </div>
 
-            {/* Pending Tasks */}
-            <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-2xl p-6 shadow-lg mb-6 text-center">
-              <div className="text-3xl mb-2">📌</div>
-              <div className="text-lg font-bold">งานที่ยังไม่เสร็จ</div>
-              <div className="text-sm opacity-90">{pendingCount} รายการ</div>
-            </div>
-          </div>
-        </div>
+    {/* งานที่ยังไม่เสร็จ */}
+    <div className="bg-white rounded-2xl p-6 shadow-lg mb-6 text-center flex flex-col items-center">
+      <FaTasks className="text-yellow-500 text-3xl mb-2" />
+      <div className="text-lg font-bold text-yellow-500">งานที่ยังไม่เสร็จ</div>
+      <div className="text-md text-yellow-400">{pendingCount} รายการ</div>
+    </div>
+
+  </div>
+</div>
+</div>
 
 
         {/* Latest Reminders */}
         <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
-          <h2 className="text-xl font-bold mb-4 text-pink-600">🛎 แจ้งเตือนล่าสุด</h2>
+          <h2 className="text-xl font-bold mb-4 text-black"> การแจ้งเตือนล่าสุด</h2>
           {latestReminders.length === 0 ? (
             <p className="text-gray-400 font-semibold">ไม่มีแจ้งเตือน</p>
           ) : (
@@ -386,7 +396,8 @@ export default function First_page() {
 
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
+          
           <button
             onClick={() => {
               setForm({
@@ -404,7 +415,7 @@ export default function First_page() {
             }}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition"
           >
-            <div className="text-4xl mb-3">➕</div>
+            <div className="text-4xl mb-3">✚</div>
             <h3 className="text-lg font-bold mb-1">เพิ่มสัตว์เลี้ยงใหม่</h3>
             <p className="text-sm opacity-90">เพิ่มสมาชิกใหม่ในครอบครัว</p>
           </button>
@@ -413,7 +424,7 @@ export default function First_page() {
             onClick={GotoHealthPage}
             className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition"
           >
-            <div className="text-4xl mb-3">🏥</div>
+            <div className="text-4xl mb-3">✚</div>
             <h3 className="text-lg font-bold mb-1">บันทึกสุขภาพ</h3>
             <p className="text-sm opacity-90">อัปเดตข้อมูลการดูแล</p>
           </button>
@@ -422,7 +433,7 @@ export default function First_page() {
             onClick={GotoComunityPage}
             className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition"
           >
-            <div className="text-4xl mb-3">🌟</div>
+            <div className="text-4xl mb-3">✚</div>
             <h3 className="text-lg font-bold mb-1">แชร์ในคอมมูนิตี้</h3>
             <p className="text-sm opacity-90">อวดสัตว์เลี้ยงน่ารักของคุณ</p>
           </button>
@@ -597,6 +608,7 @@ export default function First_page() {
           </div>
         </div>
       )}
+      </div>
     </>
   );
 
