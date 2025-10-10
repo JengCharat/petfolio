@@ -37,6 +37,20 @@ interface User {
   updatedAt: string; 
 }
 
+
+interface Pet {
+        _id: string,
+        name: string,
+        type: string,
+        breed: string,
+        birthdate: string,
+        weight: string,
+        gender: string,
+        personality: string,
+        medicalConditions: string,
+        createdAt:string, 
+        updatedAt: string,
+}
 export default function Admin() {
   const router = useRouter();
 
@@ -75,7 +89,7 @@ export default function Admin() {
     ////////////////////////////////////////////////////////////////////////
     const [AllUser,SetAllUser] = useState<User[]>([]); 
 
-    const [selectedYear, SetSelectedYear] = useState<number>(new Date().getFullYear());
+    const [selectedUserYear, SetSelectedUserYear] = useState<number>(new Date().getFullYear());
         useEffect(() => {
             const fetchAllUser = async () => {
               try {
@@ -95,18 +109,18 @@ export default function Admin() {
 
 
 
-            const years = Array.from(new Set(AllUser.map(u => new Date(u.createdAt).getFullYear()))).sort();
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const user_years = Array.from(new Set(AllUser.map(u => new Date(u.createdAt).getFullYear()))).sort();
+            const user_months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
             const user_register_data = {
-              labels: months,
+              labels: user_months,
               datasets: [
                 {
-                  label: `Users in ${selectedYear}`,
-                  data: months.map((m, i) => {
+                  label: `Users in ${selectedUserYear}`,
+                  data: user_months.map((m, i) => {
                     return AllUser.filter(user => {
                       const date = new Date(user.createdAt);
-                      return date.getFullYear() === selectedYear && date.getMonth() === i;
+                      return date.getFullYear() === selectedUserYear && date.getMonth() === i;
                     }).length;
                   }),
                   fill: true,
@@ -116,6 +130,50 @@ export default function Admin() {
               ]
             };
 ////////////////////////////////////////////////////////////////////////////
+    
+    const [AllPet,SetAllPet] = useState<Pet[]>([]); 
+
+    const [selectedPetYear, SetSelectedPetYear] = useState<number>(new Date().getFullYear());
+        useEffect(() => {
+            const fetchAllPet = async () => {
+              try {
+                const response = await fetch('http://localhost:3002/api/pets');
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data: Pet[] = await response.json();
+                SetAllPet(data);
+              } catch (err) {
+                console.error(err);
+              }
+            };
+
+            fetchAllPet(); 
+          }, []); 
+
+
+
+            const years = Array.from(new Set(AllPet.map(u => new Date(u.createdAt).getFullYear()))).sort();
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            const pet_create_data = {
+              labels: months,
+              datasets: [
+                {
+                  label: `Users in ${selectedPetYear}`,
+                  data: months.map((m, i) => {
+                    return AllPet.filter(pet => {
+                      const date = new Date(pet.createdAt);
+                      return date.getFullYear() === selectedPetYear && date.getMonth() === i;
+                    }).length;
+                  }),
+                  fill: true,
+                  backgroundColor: "rgba(75,192,192,0.2)",
+                  borderColor: "rgba(75,192,192,1)"
+                }
+              ]
+            };
+    ////////////////////////////////////////////////////
   return (
     <>
       <h1>This is admin page</h1>
@@ -128,7 +186,7 @@ export default function Admin() {
               </ul>
             <label>
                     Select Year:{" "}
-                    <select value={selectedYear} onChange={e => SetSelectedYear(Number(e.target.value))}>
+                    <select value={selectedUserYear} onChange={e => SetSelectedUserYear(Number(e.target.value))}>
                       {years.map(y => (
                         <option key={y} value={y}>{y}</option>
                       ))}
@@ -137,6 +195,21 @@ export default function Admin() {
 
                   <Line data={user_register_data} />
 
+
+
+           {/* //////////////////////////////////////////////////////////  */}
+            <label>
+                    Select Year:{" "}
+                    <select value={selectedPetYear} onChange={e => SetSelectedPetYear(Number(e.target.value))}>
+                      {years.map(y => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <Line data={pet_create_data} />
+
+           {/* //////////////////////////////////////////////////////////  */}
     </>
   );
 }

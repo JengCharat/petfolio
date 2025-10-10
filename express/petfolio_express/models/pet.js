@@ -13,6 +13,7 @@ const petSchema = new mongoose.Schema({
   privacy: { type: String, enum: ["private", "public"], default: "private" },
 
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true } // เชื่อม User
-});
+},
+    {timestamps:true});
 
 module.exports = mongoose.model("Pet", petSchema);
