@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+ import { AiOutlineAlert, AiOutlineClockCircle, AiOutlineCalendar, AiOutlineCheckCircle } from 'react-icons/ai';
 
 // --- Types ---
 type PetType = "dog" | "cat" | "bird" | "fish" | "rabbit" | "hamster" | "unknown";
@@ -160,7 +161,7 @@ export default function Reminder() {
     const form = e.currentTarget;
     const datetimeInput = (form.elements.namedItem("datetime") as HTMLInputElement).value;
     const petId = (form.elements.namedItem("petId") as HTMLSelectElement).value;
-    const title = (form.elements.namedItem("type") as HTMLSelectElement).value || "กิจกรรม";
+    const title = (form.elements.namedItem("title") as HTMLInputElement).value;
     const details = (form.elements.namedItem("note") as HTMLTextAreaElement).value || "";
 
     if (!petId) return alert("กรุณาเลือกสัตว์เลี้ยง");
@@ -278,42 +279,60 @@ export default function Reminder() {
 
   // --- Render ---
   return (
-    <div className="section">
+    <div className="section font-sans">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-            <div className="text-2xl mb-2">🚨</div>
-            <div className="text-lg font-bold text-red-600">เร่งด่วน</div>
-            <div className="text-sm text-red-500">{countUrgent} รายการ</div>
-          </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
-            <div className="text-2xl mb-2">⏰</div>
-            <div className="text-lg font-bold text-orange-600">วันนี้</div>
-            <div className="text-sm text-orange-500">{countToday} รายการ</div>
-          </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-            <div className="text-2xl mb-2">📅</div>
-            <div className="text-lg font-bold text-blue-600">สัปดาห์นี้</div>
-            <div className="text-sm text-blue-500">{countThisWeek} รายการ</div>
-          </div>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-            <div className="text-2xl mb-2">✅</div>
-            <div className="text-lg font-bold text-green-600">เสร็จแล้ว</div>
-            <div className="text-sm text-green-500">{countCompleted} รายการ</div>
-          </div>
-        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  {/* Dashboard Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 justify-center max-w-6xl mx-auto">
+
+    {/* เร่งด่วน */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineAlert className="text-4xl text-red-500 mb-4" />
+      <div className="text-lg font-semibold text-red-600 mb-1">เร่งด่วน</div>
+      <div className="text-md text-red-600">{countUrgent} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่เลยกำหนด*</div>
+    </div>
+
+    {/* วันนี้ */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineClockCircle className="text-4xl text-orange-500 mb-4" />
+      <div className="text-lg font-semibold text-orange-600 mb-1">วันนี้</div>
+      <div className="text-md text-orange-500">{countToday} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่กำหนดไว้ในวันนี้*</div>
+    </div>
+
+    {/* สัปดาห์นี้ */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineCalendar className="text-4xl text-blue-500 mb-4" />
+      <div className="text-lg font-semibold text-blue-600 mb-1">สัปดาห์นี้</div>
+      <div className="text-md text-blue-500">{countThisWeek} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่กำหนดไว้ในสัปดาห์นี้*</div>
+    </div>
+
+    {/* เสร็จแล้ว */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md flex flex-col items-center justify-center text-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
+      <AiOutlineCheckCircle className="text-4xl text-green-500 mb-4" />
+      <div className="text-lg font-semibold text-green-600 mb-1">เสร็จแล้ว</div>
+      <div className="text-md text-green-500">{countCompleted} รายการ</div>
+      <div className="text-sm text-gray-500 pt-3">*รายการที่เสร็จสิ้นแล้ว*</div>
+    </div>
+
+  </div>
+</div>
+
 
         {/* Header + Add Button */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800">การแจ้งเตือน</h2>
-          <button onClick={() => setIsReminderModalOpen(true)} className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-medium transition shadow-lg">➕ เพิ่มการแจ้งเตือน</button>
+          <button onClick={() => setIsReminderModalOpen(true)} className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition shadow-lg">✚ เพิ่มการแจ้งเตือน</button>
         </div>
 
         {/* Reminder List */}
         {isLoading ? <p>กำลังโหลด...</p> :
-          reminders.length === 0 ? <p className="text-red-500">ไม่พบการแจ้งเตือนสำหรับผู้ใช้คนนี้</p> :
+          reminders.length === 0 ? <p className="text-gray-500">ไม่พบการแจ้งเตือน</p> :
           <div className="space-y-4">
             {reminders.sort((a,b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime()).map(r => {
               const pet = r.petId!;
@@ -326,20 +345,21 @@ export default function Reminder() {
                   <div className="flex items-center space-x-4">
                     <div className="text-3xl">{pet?.emoji || "🐾"}</div>
                     <div>
-                      <h3 className="font-bold text-gray-800">{r.title}</h3>
-                      <p className="text-gray-600">{pet?.name || "ไม่ทราบ"}</p>
-                      <p className="text-sm text-gray-500">{datetime.toLocaleString("th-TH")}</p>
-                      {r.details && <p className="text-sm text-gray-600 mt-1">หมายเหตุ: {r.details}</p>}
+                      <h3 className="font-bold text-gray-800">หัวข้อการแจ้งเตือน: {r.title}</h3>
+                      <p className="text-gray-600">ชื่อสัตว์เลี้ยง: {pet?.name || "ไม่ทราบ"}</p>
+                      <p className="text-sm text-gray-500">วันที่: {datetime.toLocaleString("th-TH")}</p>
+                      {r.details && <p className="text-sm text-gray-600 mt-1">รายละเอียด: {r.details}</p>}
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    {isOverdue && <span className="text-red-600 font-bold">เลยกำหนด</span>}
-                    <button onClick={() => handleMarkComplete(r._id)} className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700">ทำเครื่องหมาย</button>
+                    {isOverdue && <span className="text-red-600 font-bold">เลยกำหนด !</span>}
+                    <button onClick={() => handleMarkComplete(r._id)} className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700">เสร็จแล้ว</button>
                   </div>
                 </div>
               );
             })}
           </div>
+          
         }
 
         {/* Reminder Modal */}
@@ -348,48 +368,50 @@ export default function Reminder() {
             <div className="bg-white rounded-2xl max-w-xl w-full p-8 shadow-2xl">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">เพิ่มการแจ้งเตือนใหม่</h3>
               <form onSubmit={handleFormSubmit} className="space-y-4">
+
+                 {/* Type select */}
+                <div>
+                    <label className="block text-gray-700 font-medium mb-2" >ชื่อการแจ้งเตือน *</label>
+                    <input type="text" placeholder="กรอกชื่อการแจ้งเตือน" name="title" className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" required />
+                </div>
+
                 {/* Pet select */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">เลือกสัตว์เลี้ยง *</label>
-                  <select name="petId" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedPetId} onChange={e => setSelectedPetId(e.target.value)} required>
+                  <select name="petId" className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedPetId} onChange={e => setSelectedPetId(e.target.value)} required>
                     <option value="">-- เลือกสัตว์เลี้ยง --</option>
                     {pets.length > 0 ? pets.map(p => <option key={p._id} value={p._id}>{p.name} {p.emoji}</option>) : <option disabled>คุณยังไม่มีสัตว์เลี้ยง</option>}
-                  </select>
-                </div>
-
-                {/* Type select */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">ประเภทการแจ้งเตือน *</label>
-                  <select name="type" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedType} onChange={e => handleTypeChange(e.target.value)} required>
-                    <option value="">-- เลือกประเภท --</option>
-                    <option value="อาหาร">ให้อาหาร 🍽️</option>
-                    <option value="ยา">ให้ยา 💊</option>
-                    <option value="ออกกำลังกาย">ออกกำลังกาย 🏃</option>
-                    <option value="อาบน้ำ/ตัดขน">อาบน้ำ/ตัดขน ✂️</option>
-                    <option value="พบสัตวแพทย์">พบสัตวแพทย์ 🏥</option>
-                    <option value="วัคซีน">วัคซีน 💉</option>
-                    <option value="ถ่ายพยาธิ">ถ่ายพยาธิ 🐛</option>
-                    <option value="ข้อมูลสัตว์เลี้ยง">ข้อมูลสัตว์เลี้ยง 🐾</option>
                   </select>
                 </div>
 
                 {/* Datetime */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">วันและเวลา *</label>
-                  <input type="datetime-local" name="datetime" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} required />
+                  <input type="datetime-local" name="datetime" className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} required />
                 </div>
 
                 {/* Note */}
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">หมายเหตุ</label>
-                  <textarea name="note" placeholder={notePlaceholder} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500"></textarea>
+                  <label className="block text-gray-700 font-medium mb-2">รายละเอียด</label>
+                  <textarea name="note" placeholder={notePlaceholder} className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500"></textarea>
                 </div>
 
                 {/* Buttons */}
-                <div className="flex justify-end space-x-4 mt-4">
-                  <button type="button" onClick={() => setIsReminderModalOpen(false)} className="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300">ยกเลิก</button>
-                  <button type="submit" className="px-6 py-3 rounded-xl bg-orange-600 text-white hover:bg-orange-700">บันทึก</button>
-                </div>
+                <div className="w-full flex justify-end space-x-4 pt-4">
+                     <button
+                         type="button"
+                         onClick={() => setIsReminderModalOpen(false)}
+                         className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-xl"
+                     >
+                         ยกเลิก
+                     </button>
+                     <button
+                         type="submit"
+                         className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                     >
+                         บันทึก
+                     </button>
+                  </div>
               </form>
             </div>
           </div>

@@ -167,7 +167,7 @@ export default function Community() {
                     className="text-black w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
                     rows={4}
                   />
-                  <label className="cursor-pointer flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+                  <label className="cursor-pointer flex items-center gap-2 text-purple-600 hover:text-purple-500 font-medium">
                     ✚ อัปโหลดรูปภาพ <br />
                     (สูงสุด 4 ภาพ)
                     <input
@@ -259,10 +259,10 @@ export default function Community() {
                     >
 
                       {/* Username */}
-                      <p className="font-semibold text-gray-800">{post.ownerUsername}</p>
+                      <p className="font-semibold text-gray-800 text-2xl">{post.ownerUsername}</p>
 
                       {/* Description */}
-                      <p className="text-gray-700 text-base">{post.PostDesc}</p>
+                      <p className="text-gray-700 text-base text-md">{post.PostDesc}</p>
 
                       {/* Images Display */}
                       {post.images.length > 0 && (
@@ -342,7 +342,7 @@ export default function Community() {
 
                       {/* Pets */}
                       {post.pets.length > 0 && (
-                        <p className="text-gray-600 text-sm mt-2 text-right">
+                        <p className="text-gray-600 text-md mt-2 text-right">
                           ชื่อสัตว์เลี้ยง: {post.pets.map((p: any) => p.name).join(", ")}
                         </p>
                       )}
@@ -467,7 +467,7 @@ export default function Community() {
                         <div className="flex justify-end gap-2 mt-3">
                           <button
                             onClick={() => handleEdit(post._id)}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1 px-3 rounded-lg text-sm"
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-1 px-3 rounded-lg text-sm"
                           >
                             แก้ไข
                           </button>

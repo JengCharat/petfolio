@@ -3,6 +3,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar"
 import { useRouter } from "next/navigation";
 
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +29,7 @@ export default function Login() {
 
   return (
     <>
+    <div className="font-sans  bg-[#fffff]">
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
  {/* Logo */}
         <div>
@@ -71,11 +73,21 @@ export default function Login() {
             className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white 
                      rounded-xl font-medium transition-colors shadow-lg"
           >
-            Login
+            เข้าสู่ระบบ
           </button>
+          {/* Register Link */}
+
+      <p className="text-sm text-gray-500 mt-4 text-center">
+      <span
+         onClick={() => router.push("/register")} // หรือใช้ Link ของ react-router
+        className="text-purple-600 hover:underline cursor-pointer font-medium text-center"
+      >
+       ลงทะเบียน
+      </span>
+    </p>
         </div>
       </div>
-
+</div>
     </>
   );
 }
