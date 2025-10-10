@@ -2,6 +2,8 @@
 import { useEffect,useState } from "react";
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from "jwt-decode";
+import Navbar from "../components/Navbar";
+
 ////////////////////////////////////////////////////////////
 import { Line } from "react-chartjs-2";
 import {
@@ -72,6 +74,11 @@ interface CommunityPost {
 }
 //////////////////////////////////////////////////////////
 export default function Admin() {
+
+
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -294,160 +301,216 @@ export default function Admin() {
     //
     //
     ////////////////////////////////////////
+
+
+
+
   return (
     <>
-      <h1>This is admin page</h1>
-      <ul>
-        {AllUser.map(user => (
-          <li key={user._id}>
-            <strong>{user.username}</strong> ({user.email}) - Role: {user.role} - Created At: {new Date(user.createdAt).toLocaleString()}
-          </li>
+     <Navbar />
+    <div className="font-sans  flex items-center justify-center bg-gray-100 p-4">
+      
+     <div className="space-y-6 p-6 bg-gray-100 min-h-screen">
+  {/* Charts Grid */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {/* User Registrations */}
+    <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+      <h2 className="text-3xl font-bold text-gray-800 mb-4">User Registrations</h2>
+
+      <div className="mb-4">
+        <label className="block font-medium text-gray-700 mb-2">Select Year:</label>
+        <select
+          value={selectedUserYear}
+          onChange={e => SetSelectedUserYear(Number(e.target.value))}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          {years.map(y => (
+            <option key={y} value={y}>{y}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mt-4">
+        <Line data={user_register_data} />
+      </div>
+    </div>
+
+
+    {/* Pet Creations */}
+    <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+      <h2 className="text-3xl font-bold text-gray-800 mb-4">Pet Creations</h2>
+
+      <div className="mb-4">
+        <label className="block font-medium text-gray-700 mb-2">Select Year:</label>
+        <select
+          value={selectedPetYear}
+          onChange={e => SetSelectedPetYear(Number(e.target.value))}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        >
+          {years.map(y => (
+            <option key={y} value={y}>{y}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mt-4">
+        <Line data={pet_create_data} />
+      </div>
+    </div>
+
+
+
+
+  
+
+
+
+  </div>
+
+  <div className="grid grid-cols-5 gap-6">
+
+  {/* จัดการ Post (2 คอลัมน์) */}
+  <div className="col-span-2 bg-white rounded-2xl shadow-md p-6 border border-gray-200 space-y-6 h-[600px]">
+    
+    {/* หัวข้อ + ฟิลเตอร์ */}
+    <div className="flex  items-end">
+      
+      <h2 className="text-3xl font-bold text-gray-800">จัดการ Post</h2>
+
+      <div className="items-center gap-2">
+        <label className="font-semibold text-gray-700  ">
+          Filter by Pet:
+        </label>
+        <select
+          value={selectedPet || ""}
+          onChange={(e) => setSelectedPet(e.target.value || null)}
+          className="w-48 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        >
+          <option value="">All</option>
+          {AllPet.map((pet) => (
+            <option key={pet._id} value={pet.name}>
+              {pet.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    {/* Posts List */}
+<div className="space-y-4 max-h-[460px] overflow-y-auto">
+  {filteredPosts.length === 0 ? (
+    <p className="text-gray-500 text-center">ยังไม่มีโพสต์</p>
+  ) : (
+    filteredPosts.map(post => (
+      <div
+        key={post._id}
+        className="bg-gray-50 rounded-2xl shadow-sm p-4 flex flex-col gap-2 border border-gray-200 hover:shadow-md transition"
+      >
+        <p className="font-semibold text-gray-800">{post.owner.username}</p>
+        <p className="text-gray-700">{post.PostDesc}</p>
+
+        {post.images.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            {post.images.map((img, idx) => (
+              <img
+                key={idx}
+                src={`http://localhost:3002${img}`}
+                alt={`post-${idx}`}
+                className="w-full h-32 object-cover rounded-xl"
+              />
+            ))}
+          </div>
+        )}
+
+        {post.pets.length > 0 && (
+          <p className="text-gray-600 text-sm mt-2">
+            สัตว์เลี้ยง: {post.pets.map(p => p.name).join(", ")}
+          </p>
+        )}
+
+        <p className="text-gray-400 text-xs">{new Date(post.createdAt).toLocaleString()}</p>
+
+        <div className="flex justify-end mt-2">
+          <button
+            onClick={() => handleDelete(post._id)}
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-xl text-sm"
+          >
+            ลบ
+          </button>
+        </div>
+      </div>
+    ))
+  )}
+</div>
+
+  </div>
+
+  {/* จัดการผู้ใช้ (3 คอลัมน์) */}
+ <div className="col-span-3 bg-white rounded-2xl shadow-md border border-gray-200 p-6 flex flex-col h-[600px]">
+  {/* Header + Search */}
+  <div className="flex justify-between items-center mb-4 flex-shrink-0">
+    <h2 className="text-3xl font-bold text-gray-800">จัดการผู้ใช้</h2>
+    <div className="max-w-md">
+      <input
+        type="text"
+        placeholder="Search by username or email..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-64 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
+  </div>
+
+  {/* Table scrollable */}
+  <div className="overflow-auto flex-1 border rounded-lg">
+    <table className="w-full table-auto border-collapse text-left">
+      <thead className="bg-gray-100 sticky top-0 z-10">
+        <tr>
+          <th className="border px-4 py-2 text-center">Username</th>
+          <th className="border px-4 py-2 text-center">Email</th>
+          <th className="border px-4 py-2 text-center">Role</th>
+          <th className="border px-4 py-2 text-center">Status</th>
+          <th className="border px-4 py-2 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredUsers.map(user => (
+          <tr key={user._id} className="hover:bg-gray-50 transition">
+            <td className="border px-4 py-2 ">{user.username}</td>
+            <td className="border px-4 py-2 ">{user.email}</td>
+            <td className="border px-4 py-2 text-center">{user.role}</td>
+            <td className="border px-4 py-2 text-center">
+              {user.status === "active" ? (
+                <span className="text-green-600 font-semibold">Active</span>
+              ) : (
+                <span className="text-red-600 font-semibold">Banned</span>
+              )}
+            </td>
+            <td className="border px-4 py-2 text-center">
+              <button
+                onClick={() => handleToggleStatus(user.userId)}
+                className={`px-3 py-1 rounded text-white ${
+                  user.status === "active"
+                    ? "bg-red-500 hover:bg-red-600 rounded-xl"
+                    : "bg-green-500 hover:bg-green-600 rounded-xl"
+                }`}
+              >
+                {user.status === "active" ? "Ban" : "Unban"}
+              </button>
+            </td>
+          </tr>
         ))}
-              </ul>
-            <label>
-                    Select Year:{" "}
-                    <select value={selectedUserYear} onChange={e => SetSelectedUserYear(Number(e.target.value))}>
-                      {years.map(y => (
-                        <option key={y} value={y}>{y}</option>
-                      ))}
-                    </select>
-                  </label>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-                  <Line data={user_register_data} />
+</div>
 
 
+</div>
+  </div>
 
-           {/* //////////////////////////////////////////////////////////  */}
-            <label>
-                    Select Year:{" "}
-                    <select value={selectedPetYear} onChange={e => SetSelectedPetYear(Number(e.target.value))}>
-                      {years.map(y => (
-                        <option key={y} value={y}>{y}</option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <Line data={pet_create_data} />
-
-           {/* //////////////////////////////////////////////////////////  */}
-
-                            <div className="mb-4">
-                              <label className="font-semibold mr-2">Filter by Pet:</label>
-                              <select
-                                value={selectedPet || ""}
-                                onChange={(e) => setSelectedPet(e.target.value || null)}
-                                className="border rounded px-2 py-1"
-                              >
-                                <option value="">All</option>
-                                {AllPet.map((pet) => (
-                                  <option key={pet._id} value={pet.name}>
-                                    {pet.name}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-            <div className="space-y-4">
-                {filteredPosts.length === 0 ? (
-                    <p className="text-gray-500 text-center">ยังไม่มีโพสต์</p>
-                  ) : (
-
-                filteredPosts.map(post => (
-                      <div key={post._id} className="bg-white rounded-2xl shadow-md p-4 flex flex-col gap-2 border border-gray-200">
-                        {/* Username */}
-                        <p className="font-semibold text-gray-800">{post.owner.username}</p>
-
-                        {/* Description */}
-                        <p className="text-gray-700">{post.PostDesc}</p>
-
-                        {/* Images */}
-                        {post.images.length > 0 && (
-                          <div className="grid grid-cols-2 gap-2">
-                            {post.images.map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={`http://localhost:3002${img}`}
-                                alt={`post-${idx}`}
-                                className="w-full h-32 object-cover rounded-xl"
-                              />
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Pets */}
-                        {post.pets.length > 0 && (
-                          <p className="text-gray-600 text-sm mt-2">
-                            สัตว์เลี้ยง: {post.pets.map(p => p.name).join(", ")}
-                          </p>
-                        )}
-
-                        {/* Created At */}
-                        <p className="text-gray-400 text-xs">{new Date(post.createdAt).toLocaleString()}</p>
-
-                        {/* Delete Button */}
-                        <div className="flex justify-end mt-2">
-                          <button
-                            onClick={() => handleDelete(post._id)}
-                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
-                          >
-                            ลบ
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-                {/* ///////////////////////////////////////////////////////////////// */}
-            <div className="mb-4">
-                    <input
-                      type="text"
-                      placeholder="Search by username or email..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="border rounded px-3 py-1 w-full max-w-sm"
-                    />
-                  </div>
-                    <div className="p-6">
-                          <h1 className="text-xl font-bold mb-4">จัดการผู้ใช้</h1>
-                          <table className="w-full table-auto border-collapse">
-                            <thead>
-                              <tr className="bg-gray-100">
-                                <th className="border px-4 py-2">Username</th>
-                                <th className="border px-4 py-2">Email</th>
-                                <th className="border px-4 py-2">Role</th>
-                                <th className="border px-4 py-2">Status</th>
-                                <th className="border px-4 py-2">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                         {filteredUsers.map(user => (
-                                <tr key={user._id} className="hover:bg-gray-50">
-                                  <td className="border px-4 py-2">{user.username}</td>
-                                  <td className="border px-4 py-2">{user.email}</td>
-                                  <td className="border px-4 py-2">{user.role}</td>
-                                  <td className="border px-4 py-2">
-                                    {user.status === "active" ? (
-                                      <span className="text-green-600 font-semibold">Active</span>
-                                    ) : (
-                                      <span className="text-red-600 font-semibold">Banned</span>
-                                    )}
-                                  </td>
-                                  <td className="border px-4 py-2">
-                                    <button
-                                      onClick={() => handleToggleStatus(user.userId)}
-                                      className={`px-3 py-1 rounded ${
-                                        user.status === "active"
-                                          ? "bg-red-500 hover:bg-red-600 text-white"
-                                          : "bg-green-500 hover:bg-green-600 text-white"
-                                      }`}
-                                    >
-                                      {user.status === "active" ? "Ban" : "Unban"}
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
     </>
   );
 }
