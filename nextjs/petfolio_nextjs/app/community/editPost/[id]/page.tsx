@@ -104,10 +104,22 @@ export default function EditPostPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    setNewImages(prev => [...prev, ...Array.from(e.target.files)]);
-  };
+   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = e.currentTarget.files;
+  if (!files) return;
+
+  // รวมไฟล์ทั้งหมด (รูปเดิม + รูปใหม่ + รูปที่เพิ่งเลือก)
+  const totalImages = existingImages.length + newImages.length + files.length;
+
+  // ถ้ามากกว่า 4 → แจ้งเตือนและไม่เพิ่ม
+  if (totalImages > 4) {
+    alert("ใส่ภาพได้สูงสุด 4 ภาพ");
+    return;
+  }
+
+  setNewImages(prev => [...prev, ...Array.from(files)]);
+};
+
 
   const handleRemoveImage = (idx: number, type: "existing" | "new") => {
     if (type === "existing") {
