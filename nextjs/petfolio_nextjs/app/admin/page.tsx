@@ -270,6 +270,16 @@ export default function Admin() {
                   console.error(err);
                 }
               };
+
+
+
+
+
+             const [searchTerm, setSearchTerm] = useState<string>("");
+            const filteredUsers = AllUser.filter(user =>
+              (user.username ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+              (user.email ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+            );
     //
     //
     //
@@ -386,6 +396,15 @@ export default function Admin() {
                   )}
                 </div>
                 {/* ///////////////////////////////////////////////////////////////// */}
+            <div className="mb-4">
+                    <input
+                      type="text"
+                      placeholder="Search by username or email..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="border rounded px-3 py-1 w-full max-w-sm"
+                    />
+                  </div>
                     <div className="p-6">
                           <h1 className="text-xl font-bold mb-4">จัดการผู้ใช้</h1>
                           <table className="w-full table-auto border-collapse">
@@ -399,7 +418,7 @@ export default function Admin() {
                               </tr>
                             </thead>
                             <tbody>
-                              {AllUser.map(user => (
+                         {filteredUsers.map(user => (
                                 <tr key={user._id} className="hover:bg-gray-50">
                                   <td className="border px-4 py-2">{user.username}</td>
                                   <td className="border px-4 py-2">{user.email}</td>
