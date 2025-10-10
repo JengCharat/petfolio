@@ -2,7 +2,22 @@
 import { useEffect,useState } from "react";
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from "jwt-decode";
+////////////////////////////////////////////////////////////
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
 
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
+
+/////////////////////////////////////////////////////////
 interface TokenPayload {
   userId: string;
   username: string;
@@ -59,6 +74,8 @@ export default function Admin() {
 
     ////////////////////////////////////////////////////////////////////////
     const [AllUser,SetAllUser] = useState<User[]>([]); 
+
+    const [selectedYear, SetSelectedYear] = useState<number>(new Date().getFullYear());
         useEffect(() => {
             const fetchAllUser = async () => {
               try {
@@ -75,6 +92,29 @@ export default function Admin() {
 
             fetchAllUser(); 
           }, []); 
+
+
+
+            const years = Array.from(new Set(AllUser.map(u => new Date(u.createdAt).getFullYear()))).sort();
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            const user_register_data = {
+              labels: months,
+              datasets: [
+                {
+                  label: `Users in ${selectedYear}`,
+                  data: months.map((m, i) => {
+                    return AllUser.filter(user => {
+                      const date = new Date(user.createdAt);
+                      return date.getFullYear() === selectedYear && date.getMonth() === i;
+                    }).length;
+                  }),
+                  fill: true,
+                  backgroundColor: "rgba(75,192,192,0.2)",
+                  borderColor: "rgba(75,192,192,1)"
+                }
+              ]
+            };
 ////////////////////////////////////////////////////////////////////////////
   return (
     <>
@@ -85,7 +125,17 @@ export default function Admin() {
             <strong>{user.username}</strong> ({user.email}) - Role: {user.role} - Created At: {new Date(user.createdAt).toLocaleString()}
           </li>
         ))}
-      </ul>
+              </ul>
+            <label>
+                    Select Year:{" "}
+                    <select value={selectedYear} onChange={e => SetSelectedYear(Number(e.target.value))}>
+                      {years.map(y => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <Line data={user_register_data} />
 
     </>
   );
