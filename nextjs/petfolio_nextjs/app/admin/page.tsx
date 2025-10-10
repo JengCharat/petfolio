@@ -51,6 +51,25 @@ interface Pet {
         createdAt:string, 
         updatedAt: string,
 }
+
+interface Owner {
+  _id: string;
+  userId: string;
+  username: string;
+}
+interface CommunityPost {
+  _id: string;
+  PostDesc: string;
+  images: string[];
+  pets: Pet[];
+  likes: number;
+  comments: any[]; 
+  owner: Owner;
+  createdAt: string;
+  __v: number;
+  ownerUsername: string;
+}
+//////////////////////////////////////////////////////////
 export default function Admin() {
   const router = useRouter();
 
@@ -174,6 +193,50 @@ export default function Admin() {
               ]
             };
     ////////////////////////////////////////////////////
+            const [posts, setPosts] = useState<CommunityPost[]>([]);
+
+            const [selectedPet, setSelectedPet] = useState<string | null>(null);
+
+            useEffect(() => {
+              fetch("http://localhost:3002/api/community-posts")
+                .then(res => res.json())
+                .then((data: CommunityPost[]) => setPosts(data));
+            }, []);
+
+
+
+
+
+
+            const filteredPosts = selectedPet
+                ? posts.filter(post => post.pets.some(pet => pet.name === selectedPet))
+                : posts
+
+
+
+
+
+
+
+            const handleDelete = async (postId: string) => {
+              const confirmed = window.confirm("คุณแน่ใจไหมว่าต้องการลบโพสต์นี้?");
+              if (!confirmed) return;
+
+              try {
+                const res = await fetch(`http://localhost:3002/community/posts/${postId}`, {
+                  method: "DELETE"
+                });
+                if (res.ok) {
+                  setPosts(posts.filter(p => p._id !== postId));
+                } else {
+                  console.error("Delete failed");
+                }
+              } catch (err) {
+                console.error(err);
+              }
+
+            }
+    ////////////////////////////////////////////////////
   return (
     <>
       <h1>This is admin page</h1>
@@ -210,6 +273,73 @@ export default function Admin() {
                   <Line data={pet_create_data} />
 
            {/* //////////////////////////////////////////////////////////  */}
+
+                            <div className="mb-4">
+                              <label className="font-semibold mr-2">Filter by Pet:</label>
+                              <select
+                                value={selectedPet || ""}
+                                onChange={(e) => setSelectedPet(e.target.value || null)}
+                                className="border rounded px-2 py-1"
+                              >
+                                <option value="">All</option>
+                                {AllPet.map((pet) => (
+                                  <option key={pet._id} value={pet.name}>
+                                    {pet.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+            <div className="space-y-4">
+                {filteredPosts.length === 0 ? (
+                    <p className="text-gray-500 text-center">ยังไม่มีโพสต์</p>
+                  ) : (
+
+                filteredPosts.map(post => (
+                      <div key={post._id} className="bg-white rounded-2xl shadow-md p-4 flex flex-col gap-2 border border-gray-200">
+                        {/* Username */}
+                        <p className="font-semibold text-gray-800">{post.owner.username}</p>
+
+                        {/* Description */}
+                        <p className="text-gray-700">{post.PostDesc}</p>
+
+                        {/* Images */}
+                        {post.images.length > 0 && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {post.images.map((img, idx) => (
+                              <img
+                                key={idx}
+                                src={`http://localhost:3002${img}`}
+                                alt={`post-${idx}`}
+                                className="w-full h-32 object-cover rounded-xl"
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Pets */}
+                        {post.pets.length > 0 && (
+                          <p className="text-gray-600 text-sm mt-2">
+                            สัตว์เลี้ยง: {post.pets.map(p => p.name).join(", ")}
+                          </p>
+                        )}
+
+                        {/* Created At */}
+                        <p className="text-gray-400 text-xs">{new Date(post.createdAt).toLocaleString()}</p>
+
+                        {/* Delete Button */}
+                        <div className="flex justify-end mt-2">
+                          <button
+                            onClick={() => handleDelete(post._id)}
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
+                          >
+                            ลบ
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {/* ///////////////////////////////////////////////////////////////// */}
     </>
   );
 }
