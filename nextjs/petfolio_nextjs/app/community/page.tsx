@@ -3,6 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 
+import { jwtDecode } from "jwt-decode";
+
+interface TokenPayload {
+  userId: string;
+  username: string;
+  email: string;
+  role: string;
+  status:string;
+  exp: number;
+}
+
 export default function Community() {
   const [currentUser, setCurrentUser] = useState<{ _id: string } | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -24,7 +35,34 @@ export default function Community() {
     setToken(storedToken);
     if (storedUserId) setCurrentUser({ _id: storedUserId });
   }, []);
+///////////////////////////////////////////////////////////////////////////
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode<TokenPayload>(token);
+
+      if (decoded.status !== "active") {
+        router.push("/banpage"); 
+        return;
+      }
+
+      if (decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+
+    } catch (err) {
+      console.error("Invalid token", err);
+      router.push("/login");
+    }
+  }, [router]);
+///////////////////////////////////////////////////////////
   // โหลดสัตว์เลี้ยง
   useEffect(() => {
     if (!token || !currentUser) return;

@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema({
     enum:['user','admin'],
     default:'user'},
     password: { type: String, required: true },
+    status: {
+        type: String,
+        enum: ['active', 'banned'], 
+        default: 'active' 
+    }
    }, {timestamps:true}
 );
 

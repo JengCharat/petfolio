@@ -33,6 +33,7 @@ interface User {
   email: string;
   role: 'user' | 'admin';
   password: string;
+  status:string;
   createdAt: string; 
   updatedAt: string; 
 }
@@ -237,6 +238,51 @@ export default function Admin() {
 
             }
     ////////////////////////////////////////////////////
+    //
+    //
+    //
+    //
+    //
+    //
+            const handleToggleStatus = async (userId: string) => {
+                const user = AllUser.find(u => u.userId === userId);
+                if (!user) return;
+
+                const confirmMsg =
+                  user.status === "active"
+                    ? `คุณแน่ใจไหมว่าต้องการแบน ${user.username}?`
+                    : `คุณแน่ใจไหมว่าต้องการปลดแบน ${user.username}?`;
+
+                if (!window.confirm(confirmMsg)) return;
+
+                try {
+                  const res = await fetch(`http://localhost:3002/users/ban/${userId}`, {
+                    method: "PUT",
+                  });
+
+                  if (res.ok) {
+                    const data = await res.json();
+                    SetAllUser(AllUser.map(u => u.userId === userId ? { ...u, status: data.status } : u));
+                  } else {
+                    console.error("Failed to toggle status");
+                  }
+                } catch (err) {
+                  console.error(err);
+                }
+              };
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    ////////////////////////////////////////
   return (
     <>
       <h1>This is admin page</h1>
@@ -340,6 +386,48 @@ export default function Admin() {
                   )}
                 </div>
                 {/* ///////////////////////////////////////////////////////////////// */}
+                    <div className="p-6">
+                          <h1 className="text-xl font-bold mb-4">จัดการผู้ใช้</h1>
+                          <table className="w-full table-auto border-collapse">
+                            <thead>
+                              <tr className="bg-gray-100">
+                                <th className="border px-4 py-2">Username</th>
+                                <th className="border px-4 py-2">Email</th>
+                                <th className="border px-4 py-2">Role</th>
+                                <th className="border px-4 py-2">Status</th>
+                                <th className="border px-4 py-2">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {AllUser.map(user => (
+                                <tr key={user._id} className="hover:bg-gray-50">
+                                  <td className="border px-4 py-2">{user.username}</td>
+                                  <td className="border px-4 py-2">{user.email}</td>
+                                  <td className="border px-4 py-2">{user.role}</td>
+                                  <td className="border px-4 py-2">
+                                    {user.status === "active" ? (
+                                      <span className="text-green-600 font-semibold">Active</span>
+                                    ) : (
+                                      <span className="text-red-600 font-semibold">Banned</span>
+                                    )}
+                                  </td>
+                                  <td className="border px-4 py-2">
+                                    <button
+                                      onClick={() => handleToggleStatus(user.userId)}
+                                      className={`px-3 py-1 rounded ${
+                                        user.status === "active"
+                                          ? "bg-red-500 hover:bg-red-600 text-white"
+                                          : "bg-green-500 hover:bg-green-600 text-white"
+                                      }`}
+                                    >
+                                      {user.status === "active" ? "Ban" : "Unban"}
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
     </>
   );
 }
