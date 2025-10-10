@@ -183,27 +183,36 @@ router.post("/updatePost/:id", (req, res) => {
         post.pets = validPets.map(p => p._id);
       }
 
-      // อัปเดตรูป ถ้ามีการอัปโหลดใหม่หรือส่งรูปเดิมมาด้วย
+      // 🔹 เก็บรูปเดิมที่ผู้ใช้ยังไม่ลบ
       let updatedImages = [];
-
-      // 1️⃣ เก็บรูปเดิมที่ยังไม่ลบ
       if (req.body.existingImages) {
         updatedImages = Array.isArray(req.body.existingImages)
           ? req.body.existingImages
           : [req.body.existingImages];
       }
 
-      // 2️⃣ เพิ่มรูปใหม่ (ไม่ทับ)
+      // 🔹 เพิ่มรูปใหม่ที่เพิ่งอัปโหลด
       if (req.files && req.files.length > 0) {
         const newImages = req.files.map(file => `/uploads/Post/${file.filename}`);
         updatedImages = [...updatedImages, ...newImages];
       }
 
-      // 3️⃣ บันทึก
+      // 🔹 หารูปที่ถูกลบออก
+      const removedImages = post.images.filter(img => !updatedImages.includes(img));
+
+      // 🔹 ลบไฟล์ออกจากโฟลเดอร์จริง
+      for (const imgPath of removedImages) {
+        const fullPath = path.join(process.cwd(), imgPath); // เช่น /project/uploads/Post/xxxx.jpg
+        if (fs.existsSync(fullPath)) {
+          fs.unlink(fullPath, (err) => {
+            if (err) console.error(`⚠️ ลบไฟล์ไม่สำเร็จ: ${fullPath}`, err);
+            else console.log(`🗑️ ลบไฟล์เรียบร้อย: ${fullPath}`);
+          });
+        }
+      }
+
+      // 🔹 บันทึกข้อมูลใหม่
       post.images = updatedImages;
-
-
-
       await post.save();
 
       // populate pets และ owner
@@ -211,7 +220,6 @@ router.post("/updatePost/:id", (req, res) => {
         .populate("pets")
         .populate({ path: "owner", select: "username userId" });
 
-      // ส่งข้อมูลโพสต์ทั้งหมดกลับ
       res.json({
         _id: populatedPost._id,
         PostDesc: populatedPost.PostDesc,

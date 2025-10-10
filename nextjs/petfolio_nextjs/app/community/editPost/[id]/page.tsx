@@ -130,7 +130,7 @@ export default function EditPostPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="font-sans min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-black">
         <h1 className="text-2xl font-bold mb-6 text-center">แก้ไขโพสต์</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -143,8 +143,9 @@ export default function EditPostPage() {
           />
 
           {/* อัปโหลดรูป */}
-          <label className="cursor-pointer text-blue-600 hover:text-blue-700">
+          <label className="cursor-pointer text-purple-600 hover:text-purple-500">
             ✚ อัปโหลดรูปภาพ
+            <br />(สูงสุด 4 ภาพ)
             <input
               type="file"
               multiple
@@ -227,7 +228,7 @@ export default function EditPostPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 bg-gray-300 hover:bg-gray-400 text-black py-2 rounded-xl font-medium"
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 flex-1  py-2 rounded-xl font-medium"
             >
               ยกเลิก
             </button>
