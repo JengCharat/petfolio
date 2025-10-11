@@ -17,6 +17,7 @@ import { MdGroups } from "react-icons/md";
 interface JWTData {
   id: string;
   email: string;
+  username: string;
   iat: number;
   exp: number;
 }
@@ -56,6 +57,7 @@ export default function First_page() {
   const router = useRouter()
   const [userEmail, setUserEmail] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [userName, setUsername] = useState("");
   const [userId, setUserId] = useState(null);
   const [pets, setPets] = useState([]);
   const [eventsData, setEventsData] = useState({});
@@ -147,6 +149,24 @@ export default function First_page() {
       }
     }
   });
+
+  useEffect(() => {
+  const tokenRaw = localStorage.getItem("token");
+  if (tokenRaw) {
+    const token = tokenRaw.startsWith("Bearer ")
+      ? tokenRaw.split(" ")[1]
+      : tokenRaw;
+
+    try {
+      const decoded = jwtDecode<JWTData>(token);
+      if (decoded?.username) {
+        setUsername(decoded.username);
+      }
+    } catch (err) {
+      console.error("Invalid token", err);
+    }
+  }
+  }, []); // ✅ เพิ่ม [] เพื่อให้รันแค่ครั้งเดียว
 
 
 
@@ -306,7 +326,7 @@ export default function First_page() {
       <div className="font-sans  bg-[#fffff]">
         <Navbar />
         <div className="text-center p-6">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">สวัสดี {userEmail} </h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4 pt-10">สวัสดี {userName} </h1>
           <p className="text-xl text-gray-600">วันนี้สัตว์เลี้ยงของคุณเป็นอย่างไรบ้าง</p>
         </div>
         {/* Pet Count / Quick Stats */}

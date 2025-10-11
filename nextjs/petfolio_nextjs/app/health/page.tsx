@@ -203,7 +203,7 @@ export default function PetApp() {
         onClick={() => { setShowFormModal(true); setIsEdit(false); setForm({}); }}
         className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-shadow shadow-md"
       >
-        ➕ เพิ่มประวัติ
+        ✚ เพิ่มประวัติ
       </button>
     </div>
 
@@ -218,10 +218,10 @@ export default function PetApp() {
         ${selectedPet?._id === p._id ? "border-2 border-purple-500 shadow-lg" : "border border-gray-200 hover:shadow-lg"}`}
     >
       <div className="text-5xl mb-2">{typeEmoji[p.type ?? ""] ?? ""}</div>
-      <h3 className="text-xl font-bold">{p.name}</h3>
-      <p className="mb-1 text-gray-500">{p.breed ? ` ${p.breed}` : ""}</p>
+      <h3 className="text-black text-xl font-bold">ชื่อสัตว์เลี้ยง: {p.name}</h3>
+      <p className="mb-1 text-black">สายพันธุ์: {p.breed ? ` ${p.breed}` : ""}</p>
       <p className="text-red-500 font-semibold mb-1">⚠️ โรคประจำตัว/อาการแพ้</p>
-      <p className="text-red-500">{p.medicalConditions || "-"}</p>
+      <p className="text-red-500">{p.medicalConditions || "ไม่มี"}</p>
     </div>
   ))}
 </div>
@@ -251,7 +251,7 @@ export default function PetApp() {
               className="p-4 bg-gray-50 rounded-lg shadow hover:shadow-lg transition flex flex-col"
             >
               <div className="mb-2">
-                <h4 className="font-semibold">{treatmentLabels[rec.type]}</h4>
+                <h4 className=" text-black text-lg font-semibold">รายการ: {treatmentLabels[rec.type]}</h4>
               </div>
 
               <p className="text-gray-700"><strong>วันที่:</strong> {formatDate(rec.date)}</p>
@@ -356,7 +356,7 @@ export default function PetApp() {
     {showFormModal && (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 shadow-lg">
-          <h3 className="text-xl font-bold mb-4">{isEdit ? "แก้ไขประวัติสุขภาพ" : "เพิ่มประวัติสุขภาพ"}</h3>
+          <h3 className="text-black text-xl font-bold mb-4">{isEdit ? "แก้ไขประวัติสุขภาพ" : "เพิ่มประวัติสุขภาพ"}</h3>
           <form onSubmit={handleFormSubmit} className="space-y-3">
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">เลือกสัตว์เลี้ยง</label>
@@ -364,7 +364,7 @@ export default function PetApp() {
                                         name="pet"
                                         value={form.pet || ""}
                                         onChange={(e) => setForm({ ...form, pet: e.target.value })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         required
                                     >
                                         <option value="">เลือกสัตว์เลี้ยง</option>
@@ -381,7 +381,7 @@ export default function PetApp() {
                                         name="type"
                                         value={form.type || ""}
                                         onChange={(e) => setForm({ ...form, type: e.target.value as Treatment })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         required
                                     >
                                         <option value="">เลือกประเภท</option>
@@ -397,7 +397,7 @@ export default function PetApp() {
                                         name="date"
                                         value={form.date || ""}
                                         onChange={(e) => setForm({ ...form, date: e.target.value })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         required
                                     />
                                 </div>
@@ -409,7 +409,7 @@ export default function PetApp() {
                                         placeholder="คลินิก"
                                         value={form.clinic || ""}
                                         onChange={(e) => setForm({ ...form, clinic: e.target.value })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     />
                                 </div>
                                 <div>
@@ -419,7 +419,7 @@ export default function PetApp() {
                                         placeholder="รายละเอียด"
                                         value={form.detail || ""}
                                         onChange={(e) => setForm({ ...form, detail: e.target.value })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     />
                                 </div>
                                 <div>
@@ -430,25 +430,25 @@ export default function PetApp() {
                                         placeholder="ค่าใช้จ่าย"
                                         value={form.cost || ""}
                                         onChange={(e) => setForm({ ...form, cost: Number(e.target.value) })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     />
                                 </div>
                                 <div className="flex space-x-4 pt-4">
-  <button
-    type="button"
-    onClick={() => { setShowFormModal(false); setIsEdit(false); setForm({}); }}
-    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
-  >
-    ยกเลิก
-  </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setShowFormModal(false); setIsEdit(false); setForm({}); }}
+                                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                                >
+                                  ยกเลิก
+                                </button>
 
-  <button
-    type="submit"
-    className={`flex-1 px-6 py-3 ${isEdit ? "bg-yellow-500" : "bg-purple-600 hover:bg-purple-700"} text-white rounded-xl`}
-  >
-    {isEdit ? "บันทึกการแก้ไข" : "บันทึก"}
-  </button>
-</div>
+                                <button
+                                  type="submit"
+                                  className={`flex-1 px-6 py-3 ${isEdit ? "bg-yellow-500" : "bg-purple-600 hover:bg-purple-700"} text-white rounded-xl`}
+                                >
+                                  {isEdit ? "บันทึกการแก้ไข" : "บันทึก"}
+                                </button>
+                              </div>
 
                             </form>
         </div>

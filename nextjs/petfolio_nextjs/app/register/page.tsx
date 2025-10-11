@@ -31,7 +31,7 @@ export default function Register() {
         setEmail("");
         setPassword("");
         setConfirmPassword("");
-         router.push("/login");
+         router.push("/");
       } else {
         alert(data.error || "Register failed");
       }
@@ -42,7 +42,7 @@ export default function Register() {
   };
 
     const GotoLogin = () => {
-    router.push('login')
+    router.push('')
   }
 
 
@@ -67,7 +67,7 @@ export default function Register() {
 
           {/* Username */}
           <input
-            className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
+            className="text-black w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
                    focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             placeholder="Username"
             type="text"
@@ -77,7 +77,7 @@ export default function Register() {
 
           {/* Email */}
           <input
-            className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
+            className=" text-black w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
                    focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             placeholder="Email"
             type="email"
@@ -87,7 +87,7 @@ export default function Register() {
 
           {/* Password */}
           <input
-            className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
+            className="text-black w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
                    focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             placeholder="Password"
             type="password"
@@ -97,7 +97,7 @@ export default function Register() {
 
           {/* Confirm Password */}
           <input
-            className="w-full px-4 py-3 mb-6 border border-gray-300 rounded-xl 
+            className="text-black w-full px-4 py-3 mb-6 border border-gray-300 rounded-xl 
                    focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             placeholder="Confirm Password"
             type="password"

@@ -78,7 +78,7 @@ useEffect(() => {
   const logout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
-    router.push("/login"); // เปลี่ยน path เป็นหน้า login ของคุณ
+    router.push("/"); // เปลี่ยน path เป็นหน้า login ของคุณ
   };
 
   return (

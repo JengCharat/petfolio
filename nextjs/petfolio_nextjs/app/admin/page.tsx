@@ -322,7 +322,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
         <select
           value={selectedUserYear}
           onChange={e => SetSelectedUserYear(Number(e.target.value))}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="text-gray-800 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           {years.map(y => (
             <option key={y} value={y}>{y}</option>
@@ -345,7 +345,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
         <select
           value={selectedPetYear}
           onChange={e => SetSelectedPetYear(Number(e.target.value))}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="text-gray-800 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
         >
           {years.map(y => (
             <option key={y} value={y}>{y}</option>
@@ -378,13 +378,13 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
       <h2 className="text-3xl font-bold text-gray-800">จัดการ Post</h2>
 
       <div className="items-center gap-2">
-        <label className="font-semibold text-gray-700  ">
+        <label className="font-semibold text-gray-700 ">
           Filter by Pet:
         </label>
         <select
           value={selectedPet || ""}
           onChange={(e) => setSelectedPet(e.target.value || null)}
-          className="w-48 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="text-gray-800 w-48 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         >
           <option value="">All</option>
           {AllPet.map((pet) => (
@@ -456,7 +456,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
         placeholder="Search by username or email..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-64 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="text-gray-800 w-64 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
   </div>
@@ -466,27 +466,27 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     <table className="w-full table-auto border-collapse text-left">
       <thead className="bg-gray-100 sticky top-0 z-10">
         <tr>
-          <th className="border px-4 py-2 text-center">Username</th>
-          <th className="border px-4 py-2 text-center">Email</th>
-          <th className="border px-4 py-2 text-center">Role</th>
-          <th className="border px-4 py-2 text-center">Status</th>
-          <th className="border px-4 py-2 text-center">Actions</th>
+          <th className="text-gray-800 border px-4 py-2 text-center">Username</th>
+          <th className="text-gray-800 border px-4 py-2 text-center">Email</th>
+          <th className="text-gray-800 border px-4 py-2 text-center">Role</th>
+          <th className="text-gray-800 border px-4 py-2 text-center">Status</th>
+          <th className="text-gray-800 border px-4 py-2 text-center">Actions</th>
         </tr>
       </thead>
       <tbody>
         {filteredUsers.map(user => (
           <tr key={user._id} className="hover:bg-gray-50 transition">
-            <td className="border px-4 py-2 ">{user.username}</td>
-            <td className="border px-4 py-2 ">{user.email}</td>
-            <td className="border px-4 py-2 text-center">{user.role}</td>
-            <td className="border px-4 py-2 text-center">
+            <td className="text-gray-800 border px-4 py-2 ">{user.username}</td>
+            <td className="text-gray-800 border px-4 py-2 ">{user.email}</td>
+            <td className="text-gray-800 border px-4 py-2 text-center">{user.role}</td>
+            <td className="text-gray-800 border px-4 py-2 text-center">
               {user.status === "active" ? (
                 <span className="text-green-600 font-semibold">Active</span>
               ) : (
                 <span className="text-red-600 font-semibold">Banned</span>
               )}
             </td>
-            <td className="border px-4 py-2 text-center">
+            <td className="text-gray-800 border px-4 py-2 text-center">
               <button
                 onClick={() => handleToggleStatus(user.userId)}
                 className={`px-3 py-1 rounded text-white ${

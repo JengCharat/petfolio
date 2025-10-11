@@ -40,7 +40,7 @@ export default function Community() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/login");
+      router.push("/");
       return;
     }
 
@@ -54,7 +54,7 @@ export default function Community() {
 
       if (decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem("token");
-        router.push("/login");
+        router.push("/");
       }
 
     } catch (err) {

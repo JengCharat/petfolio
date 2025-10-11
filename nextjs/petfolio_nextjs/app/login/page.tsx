@@ -49,7 +49,7 @@ export default function Login() {
 
           {/* Email */}
           <input
-            className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
+            className="text-black w-full px-4 py-3 mb-4 border border-gray-300 rounded-xl 
                      focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             placeholder="Email"
             type="email"
@@ -59,7 +59,7 @@ export default function Login() {
 
           {/* Password */}
           <input
-            className="w-full px-4 py-3 mb-6 border border-gray-300 rounded-xl 
+            className="text-black w-full px-4 py-3 mb-6 border border-gray-300 rounded-xl 
                      focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             placeholder="Password"
             type="password"

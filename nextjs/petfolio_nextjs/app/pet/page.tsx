@@ -274,13 +274,13 @@ export default function PetApp() {
                                     gender: "",
                                     personality: "",
                                     medicalConditions: "",
-                                    privacy: "private",
+                                    privacy: "public",
                                 });
                                 setShowModal(true);
                             }}
                             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg"
                         >
-                            ➕ เพิ่มสัตว์เลี้ยงใหม่
+                            ✚ เพิ่มสัตว์เลี้ยงใหม่
                         </button>
 
                     </div>
@@ -290,13 +290,10 @@ export default function PetApp() {
                         {pets.map((pet) => (
                             <div key={pet._id} className="bg-white rounded-2xl p-6 shadow-md flex flex-col items-center">
                                 <div className="text-5xl mb-2">{pet.emoji}</div>
-                                <h3 className="text-xl font-bold">{pet.name}</h3>
-                                <p className="text-gray-500">{pet.breed}</p>
-                                <p className="text-gray-400 text-sm mt-1">น้ำหนัก: {pet.weight ?? "-"} กก.</p>
-                                <p className="text-gray-400 text-sm">เพศ: {pet.gender || "-"}</p>
-                                <p className="text-gray-400 text-sm">
-                                    สถานะ: {pet.privacy === "private" ? " ส่วนตัว" : " สาธารณะ"}
-                                </p>
+                                <h3 className="text-black text-xl font-bold">ชื่อสัตว์เลี้ยง: {pet.name}</h3>
+                                <p className="text-gray-500">สายพันธุ์: {pet.breed}</p>
+                                <p className="text-gray-500 text-md mt-1">น้ำหนัก: {pet.weight ?? "-"} กก.</p>
+                                <p className="text-gray-500 text-md">เพศ: {pet.gender || "-"}</p>
 
                                 {/* Buttons */}
                                 <div className="flex space-x-2 mt-4">
@@ -335,13 +332,14 @@ export default function PetApp() {
                                 <form className="space-y-6" onSubmit={addPet}>
                                     {/* Name */}
                                     <div>
-                                        <label className="block text-gray-700 font-medium mb-2">ชื่อ *</label>
+                                        <label className="block text-gray-700 font-medium mb-2">ชื่อ</label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={form.name}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="ชื่อสัตว์เลี้ยง"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             required
                                         />
                                     </div>
@@ -353,7 +351,7 @@ export default function PetApp() {
                                             name="type"
                                             value={form.type}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             required
                                         >
                                             <option value="">เลือกประเภทสัตว์</option>
@@ -375,7 +373,7 @@ export default function PetApp() {
                                             value={form.breed}
                                             onChange={handleChange}
                                             placeholder="เช่น ชิวาวา, เปอร์เซีย"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -387,7 +385,7 @@ export default function PetApp() {
                                             name="birthdate"
                                             value={form.birthdate}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -401,7 +399,8 @@ export default function PetApp() {
                                             onChange={handleChange}
                                             step="0.1"
                                             min="0"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="น้ำหนักสัตว์เลี้ยง"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -412,7 +411,7 @@ export default function PetApp() {
                                             name="gender"
                                             value={form.gender}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         >
                                             <option value="">เลือกเพศ</option>
                                             <option value="male">ผู้</option>
@@ -429,7 +428,7 @@ export default function PetApp() {
                                             onChange={handleChange}
                                             rows={3}
                                             placeholder="อธิบายนิสัยและบุคลิกภาพของสัตว์เลี้ยง..."
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         ></textarea>
                                     </div>
 
@@ -442,38 +441,11 @@ export default function PetApp() {
                                             onChange={handleChange}
                                             rows={3}
                                             placeholder="ระบุโรคประจำตัว อาการแพ้ หรือข้อควรระวังทางการแพทย์..."
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         ></textarea>
                                     </div>
 
-                                    {/* Privacy */}
-                                    <div>
-                                        <label className="block text-gray-700 font-medium mb-2">สถานะโปรไฟล์</label>
-                                        <div className="space-y-3">
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    name="privacy"
-                                                    value="private"
-                                                    checked={form.privacy === "private"}
-                                                    onChange={handleChange}
-                                                    className="text-purple-600 focus:ring-purple-500"
-                                                />
-                                                <span className="ml-3"> ส่วนตัว - เฉพาะคุณเท่านั้นที่เห็นข้อมูล</span>
-                                            </label>
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    name="privacy"
-                                                    value="public"
-                                                    checked={form.privacy === "public"}
-                                                    onChange={handleChange}
-                                                    className="text-purple-600 focus:ring-purple-500"
-                                                />
-                                                <span className="ml-3"> สาธารณะ - แสดงในคอมมูนิตี้ได้</span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    
 
                                     {/* Buttons */}
                                     <div className="flex space-x-4 pt-4">
@@ -546,12 +518,6 @@ export default function PetApp() {
                                         <span className="text-end">{selectedPet.medicalConditions || "-"}</span>
                                     </div>
 
-                                    <div className="flex justify-between">
-                                        <strong className="font-medium">สถานะ :</strong>
-                                        <span className="text-end">
-                                            {selectedPet.privacy === "private" ? "ส่วนตัว" : "สาธารณะ"}
-                                        </span>
-                                    </div>
                                 </div>
 
 
@@ -572,29 +538,29 @@ export default function PetApp() {
                     {showEditModal && editingPet && (
                         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                             <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
-                                <h3 className="text-2xl font-bold mb-6">แก้ไขข้อมูล {editingPet.name}</h3>
+                                <h3 className="text-black text-2xl font-bold mb-6">แก้ไขข้อมูล {editingPet.name}</h3>
                                 <form className="space-y-6" onSubmit={editPet}>
                                     {/* Name */}
                                     <div>
-                                        <label className="block text-gray-700 font-medium mb-2">ชื่อ *</label>
+                                        <label className="block text-gray-700 font-medium mb-2">ชื่อ</label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={form.name}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             required
                                         />
                                     </div>
 
                                     {/* Type */}
                                     <div>
-                                        <label className="block text-gray-700 font-medium mb-2">ประเภท *</label>
+                                        <label className="block text-gray-700 font-medium mb-2">ประเภท</label>
                                         <select
                                             name="type"
                                             value={form.type}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             required
                                         >
                                             <option value="">เลือกประเภทสัตว์</option>
@@ -616,7 +582,7 @@ export default function PetApp() {
                                             value={form.breed}
                                             onChange={handleChange}
                                             placeholder="เช่น ชิวาวา, เปอร์เซีย"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -628,7 +594,7 @@ export default function PetApp() {
                                             name="birthdate"
                                             value={form.birthdate}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -642,7 +608,7 @@ export default function PetApp() {
                                             onChange={handleChange}
                                             step="0.1"
                                             min="0"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -653,7 +619,7 @@ export default function PetApp() {
                                             name="gender"
                                             value={form.gender}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         >
                                             <option value="">เลือกเพศ</option>
                                             <option value="male">ผู้</option>
@@ -670,7 +636,7 @@ export default function PetApp() {
                                             onChange={handleChange}
                                             rows={3}
                                             placeholder="อธิบายนิสัยและบุคลิกภาพของสัตว์เลี้ยง..."
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         ></textarea>
                                     </div>
 
@@ -683,38 +649,11 @@ export default function PetApp() {
                                             onChange={handleChange}
                                             rows={3}
                                             placeholder="ระบุโรคประจำตัว อาการแพ้ หรือข้อควรระวังทางการแพทย์..."
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="text-black w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         ></textarea>
                                     </div>
 
-                                    {/* Privacy */}
-                                    <div>
-                                        <label className="block text-gray-700 font-medium mb-2">สถานะโปรไฟล์</label>
-                                        <div className="space-y-3">
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    name="privacy"
-                                                    value="private"
-                                                    checked={form.privacy === "private"}
-                                                    onChange={handleChange}
-                                                    className="text-purple-600 focus:ring-purple-500"
-                                                />
-                                                <span className="ml-3">ส่วนตัว - เฉพาะคุณเท่านั้นที่เห็นข้อมูล</span>
-                                            </label>
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    name="privacy"
-                                                    value="public"
-                                                    checked={form.privacy === "public"}
-                                                    onChange={handleChange}
-                                                    className="text-purple-600 focus:ring-purple-500"
-                                                />
-                                                <span className="ml-3">สาธารณะ - แสดงในคอมมูนิตี้ได้</span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                
 
                                     {/* ... */}
                                     <div className="flex space-x-4 pt-4">
