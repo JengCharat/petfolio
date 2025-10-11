@@ -19,9 +19,6 @@ router.get("/all_user",async(req,res)=>{
 })
 
 
-
-
-
 router.put("/ban/:userId", async (req, res) => {
   const { userId } = req.params;
 

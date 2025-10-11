@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-    userId: { type: String, unique: true }, // เพิ่ม field userId
+    userId: { type: String, unique: true }, 
     username: { type: String, required: true, unique: true, maxlength: 20 },
     email: { type: String, required: true, unique: true },
     role:{type:String,required:true,
