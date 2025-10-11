@@ -166,7 +166,7 @@ export default function First_page() {
       console.error("Invalid token", err);
     }
   }
-  }, []); // ✅ เพิ่ม [] เพื่อให้รันแค่ครั้งเดียว
+  }, []); //  เพิ่ม [] เพื่อให้รันแค่ครั้งเดียว
 
 
 
@@ -279,11 +279,11 @@ export default function First_page() {
 
             const data: ReminderType[] = await res.json();
 
-            // ✅ กรองงานที่ยังไม่เสร็จ
+            //  กรองงานที่ยังไม่เสร็จ
             const notDone = data.filter((r) => !r.completed);
             setPendingCount(notDone.length);
 
-            // ✅ เอา 3 อันล่าสุด
+            //  เอา 3 อันล่าสุด
             const latest = data
               .sort(
                 (a, b) =>

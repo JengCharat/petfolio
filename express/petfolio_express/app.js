@@ -21,10 +21,10 @@ const communityPostRoutes = require("./routes/community");
 
 const app = express();
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 connectDB();
 
-// ✅ CORS ให้ Next.js (3001) เรียกได้
+// CORS ให้ Next.js (3001) เรียกได้
 app.use(
   cors({
     origin: "http://localhost:3001", // หรือ "*" ชั่วคราว
@@ -34,7 +34,7 @@ app.use(
   })
 );
 
-// ✅ สำหรับ preflight OPTIONS
+// สำหรับ preflight OPTIONS
 app.options("*", cors());
 
 app.use(logger("dev"));
@@ -44,7 +44,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 
-// ✅ Routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
 app.use("/api/health", healthRoutes);
@@ -64,7 +64,7 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// ✅ Error handler
+// Error handler
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -73,7 +73,7 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Express Server running at http://localhost:${port}`);
+  console.log(`Express Server running at http://localhost:${port}`);
 });
 
 module.exports = app;

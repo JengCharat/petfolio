@@ -123,7 +123,7 @@ export default function Calendar() {
                 <div
                     key={day}
                     className="p-2 border border-gray-200 rounded-lg h-24 relative overflow-hidden cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={() => handleDayClick(dateStr)} // <--- เพิ่ม onClick ที่นี่
+                    onClick={() => handleDayClick(dateStr)} 
                 >
                     <div className="font-bold text-gray-800">{day}</div>
                     <div className="mt-1 space-y-1">

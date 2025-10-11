@@ -6,6 +6,7 @@ const { nanoid } = require("nanoid");
 
 const JWT_SECRET = 'supersecretkey'; // ใส่ env variable จริง ๆ
 
+//ฟังก์ชันสร้างบัญชีผู้ใช้ 
 // Register
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
@@ -42,7 +43,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    res.json({ token, userId: user.userId, username: user.username }); // ✅ ส่ง userId
+    res.json({ token, userId: user.userId, username: user.username }); // ส่ง userId
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

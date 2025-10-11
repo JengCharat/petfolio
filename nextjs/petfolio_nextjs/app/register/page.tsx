@@ -113,7 +113,14 @@ export default function Register() {
           >
             สมัครสมาชิก
           </button>
-          
+          <p className="text-sm text-gray-500 mt-4 text-center">
+                <span
+         onClick={() => router.push("/login")} // หรือใช้ Link ของ react-router
+        className="text-purple-600 hover:underline cursor-pointer font-medium text-center"
+      >
+       เข้าสู่ระบบ
+      </span>
+          </p>
         </div>
       </div>
       </div>

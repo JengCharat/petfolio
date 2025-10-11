@@ -369,7 +369,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   <div className="grid grid-cols-5 gap-6">
 
-  {/* จัดการ Post (2 คอลัมน์) */}
+  {/*  Post (2 คอลัมน์) */}
   <div className="col-span-2 bg-white rounded-2xl shadow-md p-6 border border-gray-200 space-y-6 h-[600px]">
     
     {/* หัวข้อ + ฟิลเตอร์ */}
@@ -445,7 +445,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   </div>
 
-  {/* จัดการผู้ใช้ (3 คอลัมน์) */}
+  {/* จัดการผู้ใช้  */}
  <div className="col-span-3 bg-white rounded-2xl shadow-md border border-gray-200 p-6 flex flex-col h-[600px]">
   {/* Header + Search */}
   <div className="flex justify-between items-center mb-4 flex-shrink-0">

@@ -154,7 +154,7 @@ export default function Community() {
       setSelectedPets([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err) {
-      console.error("❌ Error creating post:", err);
+      console.error(" Error creating post:", err);
     }
   };
 

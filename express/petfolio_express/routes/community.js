@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { files: 4 } });
 
-// 📌 สร้างโพสต์ใหม่
+// สร้างโพสต์ใหม่
 router.post("/", (req, res) => {
   // upload.array("images", 4) จะ limit ไฟล์สูงสุด 4
   upload.array("images", 4)(req, res, async (err) => {
@@ -67,7 +67,7 @@ router.post("/", (req, res) => {
         .populate("pets")
         .populate({ path: "owner", select: "username userId" });
 
-      // ✅ เพิ่ม ownerUsername ให้ frontend
+      // เพิ่ม ownerUsername ให้ frontend
       const postWithUsername = {
         ...populatedPost.toObject(),
         ownerUsername: populatedPost.owner ? populatedPost.owner.username : "Unknown",
@@ -76,14 +76,14 @@ router.post("/", (req, res) => {
       res.status(201).json(postWithUsername);
 
     } catch (err) {
-      console.error("❌ Error creating post:", err);
+      console.error(" Error creating post:", err);
       res.status(500).json({ error: err.message });
     }
   });
 });
 
 
-// 📌 ดึงโพสต์ทั้งหมด
+// ดึงโพสต์ทั้งหมด
 router.get("/", async (req, res) => {
   try {
     const posts = await CommunityPost.find()
@@ -97,7 +97,7 @@ router.get("/", async (req, res) => {
 
     res.json(postsWithUser);
   } catch (err) {
-    console.error("❌ Error fetching posts:", err);
+    console.error(" Error fetching posts:", err);
     res.status(500).json({ error: "ดึงโพสต์ไม่สำเร็จ" });
   }
 });
@@ -107,14 +107,14 @@ router.get("/user/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    // 1. หา user จาก userId
+    //  หา user จาก userId
     const user = await User.findOne({ userId: userId }); // สมมติ field ใน User คือ userId
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // 2. เอา _id ของ user เป็น ObjectId
+    //  เอา _id ของ user เป็น ObjectId
     const ownerId = user._id;
 
-    // 3. หาโพสต์โดย owner แล้วเรียงจากใหม่ → เก่า
+    //  หาโพสต์โดย owner แล้วเรียงจากใหม่ → เก่า
     const posts = await CommunityPost.find({ owner: ownerId })
     .populate("pets", "name").sort({ createdAt: -1 });
 
@@ -126,7 +126,7 @@ router.get("/user/:userId", async (req, res) => {
 });
 
 
-// GET post
+// GET post ดึงข้อมูลโพสต์ของหน้าแก้ไข
 router.get('/communityposts/:id', async (req, res) => {
   try {
     const post = await CommunityPost.findById(req.params.id)
@@ -154,7 +154,7 @@ router.get('/communityposts/:id', async (req, res) => {
 });
 
 
-// 📌 อัปเดตโพสต์
+//  อัปเดตโพสต์
 router.post("/updatePost/:id", (req, res) => {
   upload.array("images", 4)(req, res, async (err) => {
     if (err) {
@@ -183,7 +183,7 @@ router.post("/updatePost/:id", (req, res) => {
         post.pets = validPets.map(p => p._id);
       }
 
-      // 🔹 เก็บรูปเดิมที่ผู้ใช้ยังไม่ลบ
+      // เก็บรูปเดิมที่ผู้ใช้ยังไม่ลบ
       let updatedImages = [];
       if (req.body.existingImages) {
         updatedImages = Array.isArray(req.body.existingImages)
@@ -191,27 +191,27 @@ router.post("/updatePost/:id", (req, res) => {
           : [req.body.existingImages];
       }
 
-      // 🔹 เพิ่มรูปใหม่ที่เพิ่งอัปโหลด
+      // เพิ่มรูปใหม่ที่เพิ่งอัปโหลด
       if (req.files && req.files.length > 0) {
         const newImages = req.files.map(file => `/uploads/Post/${file.filename}`);
         updatedImages = [...updatedImages, ...newImages];
       }
 
-      // 🔹 หารูปที่ถูกลบออก
+      // หารูปที่ถูกลบออก
       const removedImages = post.images.filter(img => !updatedImages.includes(img));
 
-      // 🔹 ลบไฟล์ออกจากโฟลเดอร์จริง
+      // ลบไฟล์ออกจากโฟลเดอร์จริง
       for (const imgPath of removedImages) {
         const fullPath = path.join(process.cwd(), imgPath); // เช่น /project/uploads/Post/xxxx.jpg
         if (fs.existsSync(fullPath)) {
           fs.unlink(fullPath, (err) => {
-            if (err) console.error(`⚠️ ลบไฟล์ไม่สำเร็จ: ${fullPath}`, err);
-            else console.log(`🗑️ ลบไฟล์เรียบร้อย: ${fullPath}`);
+            if (err) console.error(` ลบไฟล์ไม่สำเร็จ: ${fullPath}`, err);
+            else console.log(` ลบไฟล์เรียบร้อย: ${fullPath}`);
           });
         }
       }
 
-      // 🔹 บันทึกข้อมูลใหม่
+      // บันทึกข้อมูลใหม่
       post.images = updatedImages;
       await post.save();
 
@@ -233,7 +233,7 @@ router.post("/updatePost/:id", (req, res) => {
       });
 
     } catch (err) {
-      console.error("❌ Error updating post:", err);
+      console.error(" Error updating post:", err);
       res.status(500).json({ error: err.message });
     }
   });
@@ -259,10 +259,10 @@ router.delete("/:id", async (req, res) => {
     // ถ้ามีรูปภาพในโพสต์ (หลายรูป)
     if (Array.isArray(post.images) && post.images.length > 0) {
       post.images.forEach((imgPath) => {
-        // ✅ ดึงชื่อไฟล์ เช่น "abc.jpg"
+        // ดึงชื่อไฟล์ เช่น "abc.jpg"
         const fileName = path.basename(imgPath);
 
-        // ✅ ชี้ตรงไปยังโฟลเดอร์ที่เก็บรูป
+        // ชี้ตรงไปยังโฟลเดอร์ที่เก็บรูป
         const filePath = path.join(
           process.cwd(),
           
@@ -273,12 +273,12 @@ router.delete("/:id", async (req, res) => {
 
         console.log("🟡 Trying to delete:", filePath);
 
-        // ✅ ลบไฟล์จริง
+        // ลบไฟล์จริง
         fs.unlink(filePath, (err) => {
           if (err) {
-            console.error("❌ Error deleting image:", err.message);
+            console.error("Error deleting image:", err.message);
           } else {
-            console.log("✅ Deleted image:", filePath);
+            console.log("Deleted image:", filePath);
           }
         });
       });

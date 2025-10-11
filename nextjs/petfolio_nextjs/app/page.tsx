@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react";
-import Navbar from "../components/Navbar"
+
 import { useRouter } from "next/navigation";
 
 
@@ -19,7 +19,7 @@ export default function Login() {
 
     if (data.token && data.userId) {
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userId", data.userId); // ✅ ใช้ userId
+      localStorage.setItem("userId", data.userId); // ใช้ userId
       alert("Login success");
       router.push("/dashboard");
     } else {

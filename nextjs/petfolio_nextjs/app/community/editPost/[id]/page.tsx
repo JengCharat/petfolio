@@ -97,10 +97,10 @@ export default function EditPostPage() {
       }
 
       const updatedPost = await res.json();
-      console.log("✅ Updated post:", updatedPost);
+      console.log("Updated post:", updatedPost);
       router.push("/community");
     } catch (err) {
-      console.error("❌ Error updating post:", err);
+      console.error(" Error updating post:", err);
     }
   };
 
