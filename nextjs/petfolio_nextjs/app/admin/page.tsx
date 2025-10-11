@@ -231,7 +231,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
               if (!confirmed) return;
 
               try {
-                const res = await fetch(`http://localhost:3002/community/posts/${postId}`, {
+                const res = await fetch(`http://localhost:3002/api/community-posts/${postId}`, {
                   method: "DELETE"
                 });
                 if (res.ok) {
