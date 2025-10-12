@@ -206,7 +206,7 @@ export default function First_page() {
       try {
 
         // Fetch Pets
-        const petsRes = await fetch(`http://localhost:3002/api/pets/user/${userId}`, {
+        const petsRes = await fetch(`https://petfolio.lol/api/api/pets/user/${userId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const petsData: Pet[] = petsRes.ok ? await petsRes.json() : [];
@@ -214,7 +214,7 @@ export default function First_page() {
         // setPets(formattedPets);
 
         // Fetch Reminders
-        const remRes = await fetch(`http://localhost:3002/api/reminders/user/${userId}`, {
+        const remRes = await fetch(`https://petfolio.lol/api/api/reminders/user/${userId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!remRes.ok) throw new Error("Failed to fetch reminders");
@@ -244,7 +244,7 @@ export default function First_page() {
             const userId = localStorage.getItem("userId");
             if (!userId) return;
 
-            const res = await fetch(`http://localhost:3002/api/reminders/user/${userId}`);
+            const res = await fetch(`https://petfolio.lol/api/api/reminders/user/${userId}`);
             if (!res.ok) throw new Error("Failed to fetch reminders");
 
             const data = await res.json();
@@ -275,7 +275,7 @@ export default function First_page() {
             const userId = localStorage.getItem("userId");
             if (!userId) return;
 
-            const res = await fetch(`http://localhost:3002/api/reminders/user/${userId}`);
+            const res = await fetch(`https://petfolio.lol/api/api/reminders/user/${userId}`);
             if (!res.ok) throw new Error("Failed to fetch reminders");
 
             const data: ReminderType[] = await res.json();

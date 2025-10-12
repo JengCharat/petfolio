@@ -34,7 +34,7 @@ export default function Calendar() {
                 setUserId(currentUserId);
 
                 // ดึงข้อมูลสัตว์เลี้ยงของผู้ใช้
-                const petsResponse = await fetch(`http://localhost:3002/api/pets/user/${currentUserId}`, {
+                const petsResponse = await fetch(`https://petfolio.lol/api/api/pets/user/${currentUserId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -49,7 +49,7 @@ export default function Calendar() {
                 }
 
                 // ดึงข้อมูลกิจกรรมของผู้ใช้คนนี้
-                const eventsResponse = await fetch(`http://localhost:3002/api/reminders/user/${currentUserId}`, { /* ... */ });
+                const eventsResponse = await fetch(`https://petfolio.lol/api/api/reminders/user/${currentUserId}`, { /* ... */ });
                 if (!eventsResponse.ok) {
                     throw new Error('Failed to fetch events');
                 }
@@ -165,7 +165,7 @@ export default function Calendar() {
         };
 
         try {
-            const response = await fetch('http://localhost:3002/api/reminders', {
+            const response = await fetch('https://petfolio.lol/api/api/reminders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ export default function Calendar() {
     const handleDeleteReminder = async (reminderId) => {
         if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบการแจ้งเตือนนี้?")) {
             try {
-                const response = await fetch(`http://localhost:3002/api/reminders/${reminderId}`, {
+                const response = await fetch(`https://petfolio.lol/api/api/reminders/${reminderId}`, {
                     method: 'DELETE',
                 });
 

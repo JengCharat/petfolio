@@ -121,7 +121,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
         useEffect(() => {
             const fetchAllUser = async () => {
               try {
-                const response = await fetch('http://localhost:3002/users/all_user');
+                const response = await fetch('https://petfolio.lol/api/users/all_user');
                 if (!response.ok) {
                   throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -165,7 +165,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
         useEffect(() => {
             const fetchAllPet = async () => {
               try {
-                const response = await fetch('http://localhost:3002/api/pets');
+                const response = await fetch('https://petfolio.lol/api/api/pets');
                 if (!response.ok) {
                   throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -209,7 +209,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
             const [selectedPet, setSelectedPet] = useState<string | null>(null);
             //ดึงpostในcommu
             useEffect(() => {
-              fetch("http://localhost:3002/api/community-posts")
+              fetch("https://petfolio.lol/api/api/community-posts")
                 .then(res => res.json())
                 .then((data: CommunityPost[]) => setPosts(data));
             }, []);
@@ -234,7 +234,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
               if (!confirmed) return;
 
               try {
-                const res = await fetch(`http://localhost:3002/api/community-posts/${postId}`, {
+                const res = await fetch(`https://petfolio.lol/api/api/community-posts/${postId}`, {
                   method: "DELETE"
                 });
                 if (res.ok) {
@@ -267,7 +267,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
                 if (!window.confirm(confirmMsg)) return;
 
                 try {
-                  const res = await fetch(`http://localhost:3002/users/ban/${userId}`, {
+                  const res = await fetch(`https://petfolio.lol/api/users/ban/${userId}`, {
                     method: "PUT",
                   });
 
@@ -418,7 +418,7 @@ const [isUserModalOpen, setIsUserModalOpen] = useState(false);
             {post.images.map((img, idx) => (
               <img
                 key={idx}
-                src={`http://localhost:3002${img}`}
+                src={`https://petfolio.lol/api${img}`}
                 alt={`post-${idx}`}
                 className="w-full h-32 object-cover rounded-xl"
               />

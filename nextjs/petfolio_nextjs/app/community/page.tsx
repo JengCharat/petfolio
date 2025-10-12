@@ -66,7 +66,7 @@ export default function Community() {
   // โหลดสัตว์เลี้ยง
   useEffect(() => {
     if (!token || !currentUser) return;
-    fetch(`http://localhost:3002/api/pets/user/${currentUser._id}`, {
+    fetch(`https://petfolio.lol/api/api/pets/user/${currentUser._id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -77,7 +77,7 @@ export default function Community() {
   // โหลดโพสต์ทั้งหมด
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:3002/api/community-posts", {
+    fetch("https://petfolio.lol/api/api/community-posts", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -88,7 +88,7 @@ export default function Community() {
   // โหลดโพสต์ของฉัน
   useEffect(() => {
     if (!token || !currentUser) return;
-    fetch(`http://localhost:3002/api/community-posts/user/${currentUser._id}`, {
+    fetch(`https://petfolio.lol/api/api/community-posts/user/${currentUser._id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -133,7 +133,7 @@ export default function Community() {
     newImages.forEach((file) => formData.append("images", file));
 
     try {
-      const res = await fetch("http://localhost:3002/api/community-posts", {
+      const res = await fetch("https://petfolio.lol/api/api/community-posts", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -164,7 +164,7 @@ export default function Community() {
 
     try {
       const res = await fetch(
-        `http://localhost:3002/api/community-posts/${postId}`,
+        `https://petfolio.lol/api/api/community-posts/${postId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -308,10 +308,10 @@ export default function Community() {
                           {/* กรณีมี 1 รูป */}
                           {post.images.length === 1 && (
                             <img
-                              src={`http://localhost:3002${post.images[0]}`}
+                              src={`https://petfolio.lol/api${post.images[0]}`}
                               alt="post"
                               className="w-full max-h-[400px] object-cover rounded-xl cursor-pointer"
-                              onClick={() => setOpenImage(`http://localhost:3002${post.images[0]}`)}
+                              onClick={() => setOpenImage(`https://petfolio.lol/api${post.images[0]}`)}
                             />
                           )}
 
@@ -321,10 +321,10 @@ export default function Community() {
                               {post.images.map((img: string, idx: number) => (
                                 <img
                                   key={idx}
-                                  src={`http://localhost:3002${img}`}
+                                  src={`https://petfolio.lol/api${img}`}
                                   alt={`post-${idx}`}
                                   className="w-full h-64 object-cover rounded-xl cursor-pointer"
-                                  onClick={() => setOpenImage(`http://localhost:3002${img}`)}
+                                  onClick={() => setOpenImage(`https://petfolio.lol/api${img}`)}
                                 />
                               ))}
                             </div>
@@ -334,19 +334,19 @@ export default function Community() {
                           {post.images.length === 3 && (
                             <div className="grid grid-rows-2 gap-2">
                               <img
-                                src={`http://localhost:3002${post.images[0]}`}
+                                src={`https://petfolio.lol/api${post.images[0]}`}
                                 alt="post-main"
                                 className="w-full h-64 object-cover rounded-xl cursor-pointer"
-                                onClick={() => setOpenImage(`http://localhost:3002${post.images[0]}`)}
+                                onClick={() => setOpenImage(`https://petfolio.lol/api${post.images[0]}`)}
                               />
                               <div className="grid grid-cols-2 gap-2">
                                 {post.images.slice(1).map((img: string, idx: number) => (
                                   <img
                                     key={idx}
-                                    src={`http://localhost:3002${img}`}
+                                    src={`https://petfolio.lol/api${img}`}
                                     alt={`post-${idx}`}
                                     className="w-full h-64 object-cover rounded-xl cursor-pointer"
-                                    onClick={() => setOpenImage(`http://localhost:3002${img}`)}
+                                    onClick={() => setOpenImage(`https://petfolio.lol/api${img}`)}
                                   />
                                 ))}
                               </div>
@@ -359,10 +359,10 @@ export default function Community() {
                               {post.images.slice(0, 4).map((img: string, idx: number) => (
                                 <div key={idx} className="relative">
                                   <img
-                                    src={`http://localhost:3002${img}`}
+                                    src={`https://petfolio.lol/api${img}`}
                                     alt={`post-${idx}`}
                                     className="w-full h-48 object-cover rounded-xl cursor-pointer"
-                                    onClick={() => setOpenImage(`http://localhost:3002${img}`)}
+                                    onClick={() => setOpenImage(`https://petfolio.lol/api${img}`)}
                                   />
                                   {/* ถ้ามีมากกว่า 4 รูป ให้แสดง overlay "+N" */}
                                   {idx === 3 && post.images.length > 4 && (
@@ -432,10 +432,10 @@ export default function Community() {
                             {/* กรณีมี 1 รูป */}
                             {post.images.length === 1 && (
                               <img
-                                src={`http://localhost:3002${post.images[0]}`}
+                                src={`https://petfolio.lol/api${post.images[0]}`}
                                 alt="post"
                                 className="w-full h-32 object-cover rounded-xl cursor-pointer"
-                                onClick={() => setOpenImage(`http://localhost:3002${post.images[0]}`)}
+                                onClick={() => setOpenImage(`https://petfolio.lol/api${post.images[0]}`)}
                               />
                             )}
 
@@ -445,10 +445,10 @@ export default function Community() {
                                 {post.images.map((img: string, idx: number) => (
                                   <img
                                     key={idx}
-                                    src={`http://localhost:3002${img}`}
+                                    src={`https://petfolio.lol/api${img}`}
                                     alt={`post-${idx}`}
                                     className="w-full h-32 object-cover rounded-xl cursor-pointer"
-                                    onClick={() => setOpenImage(`http://localhost:3002${img}`)}
+                                    onClick={() => setOpenImage(`https://petfolio.lol/api${img}`)}
                                   />
                                 ))}
                               </div>
@@ -458,19 +458,19 @@ export default function Community() {
                             {post.images.length === 3 && (
                               <div className="grid grid-rows-2 gap-2">
                                 <img
-                                  src={`http://localhost:3002${post.images[0]}`}
+                                  src={`https://petfolio.lol/api${post.images[0]}`}
                                   alt="post-main"
                                   className="w-full h-32 object-cover rounded-xl cursor-pointer"
-                                  onClick={() => setOpenImage(`http://localhost:3002${post.images[0]}`)}
+                                  onClick={() => setOpenImage(`https://petfolio.lol/api${post.images[0]}`)}
                                 />
                                 <div className="grid grid-cols-2 gap-2">
                                   {post.images.slice(1).map((img: string, idx: number) => (
                                     <img
                                       key={idx}
-                                      src={`http://localhost:3002${img}`}
+                                      src={`https://petfolio.lol/api${img}`}
                                       alt={`post-${idx}`}
                                       className="w-full h-32 object-cover rounded-xl cursor-pointer"
-                                      onClick={() => setOpenImage(`http://localhost:3002${img}`)}
+                                      onClick={() => setOpenImage(`https://petfolio.lol/api${img}`)}
                                     />
                                   ))}
                                 </div>
@@ -483,10 +483,10 @@ export default function Community() {
                                 {post.images.slice(0, 4).map((img: string, idx: number) => (
                                   <div key={idx} className="relative">
                                     <img
-                                      src={`http://localhost:3002${img}`}
+                                      src={`https://petfolio.lol/api${img}`}
                                       alt={`post-${idx}`}
                                       className="w-full h-32 object-cover rounded-xl cursor-pointer"
-                                      onClick={() => setOpenImage(`http://localhost:3002${img}`)}
+                                      onClick={() => setOpenImage(`https://petfolio.lol/api${img}`)}
                                     />
                                     {/* ถ้ามีมากกว่า 4 รูป ให้แสดง overlay "+N" */}
                                     {idx === 3 && post.images.length > 4 && (

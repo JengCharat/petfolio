@@ -27,7 +27,7 @@ export default function EditPostPage() {
     if (!token || !postId) return;
 
     // ดึงข้อมูลโพสต์
-    fetch(`http://localhost:3002/api/community-posts/communityposts/${postId}`, {
+    fetch(`https://petfolio.lol/api/api/community-posts/communityposts/${postId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -43,7 +43,7 @@ export default function EditPostPage() {
     // ดึงสัตว์เลี้ยงผู้ใช้
     const userId = localStorage.getItem("userId");
     if (!userId) return;
-    fetch(`http://localhost:3002/api/pets/user/${userId}`, {
+    fetch(`https://petfolio.lol/api/api/pets/user/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -82,7 +82,7 @@ export default function EditPostPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:3002/api/community-posts/updatePost/${postId}`,
+        `https://petfolio.lol/api/api/community-posts/updatePost/${postId}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -159,7 +159,7 @@ export default function EditPostPage() {
           {(existingImages.length + newImages.length) > 0 && (
             <div className="grid grid-cols-2 gap-2 mt-1">
               {existingImages.map((img, idx) => {
-                const url = `http://localhost:3002${img}`;
+                const url = `https://petfolio.lol/api${img}`;
                 return (
                   <div
                     key={`existing-${idx}`}
