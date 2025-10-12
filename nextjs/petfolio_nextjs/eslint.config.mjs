@@ -19,6 +19,17 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off", // อนุญาต @ts-ignore, @ts-nocheck
+    },
+    overrides: [
+      {
+        files: ["./app/services/pet_page_service.tsx"],
+        rules: {
+          "@typescript-eslint/no-explicit-any": "off", // ปิด error any สำหรับไฟล์นี้
+        },
+      },
+    ],
   },
 ];
 

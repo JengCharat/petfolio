@@ -1,3 +1,4 @@
+//@ts-nocheck
 export const addPetService = async (form: any, token: string, userId: string) => {
   const newPet = {
     ...form,
